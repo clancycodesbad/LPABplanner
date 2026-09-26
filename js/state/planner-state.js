@@ -32,8 +32,7 @@ export const PlannerState = {
 
     getClashes(semesterId) {
         if (!_plan[semesterId]) return {};
-        const safeTerm = currentTerm ?? 'winter2026';
-        return Engine.getClashingSubjects(_plan[semesterId], semesterId, safeTerm);
+        return Engine.getClashingSubjects(_plan[semesterId], semesterId, currentTerm);
     },
 
     getProgress() {

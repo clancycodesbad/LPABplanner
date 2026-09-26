@@ -5,39 +5,69 @@
 //   'elective'    — choose 3
 // The `type` field (Compulsory/Elective) is kept for engine compatibility.
 
-export const currentTerm = 'winter2026';
+/**
+ * Derive the current LPAB term ID from a date, so the planner always
+ * points at the right semester without a hardcoded value to update by hand.
+ *
+ * LPAB runs two terms a year:
+ *   Summer — lectures commence November, exams held ~early March
+ *   Winter — lectures commence May, exams held ~early September
+ *
+ * The term flips to the next one shortly after its exam period ends —
+ * 15 March and 15 September are used as cutoffs, a few days past each
+ * term's typical exam period (~12 Mar, ~10 Sep) and well before results
+ * are published or the next term's lectures begin, without needing exact
+ * dates that shift year to year.
+ *
+ * @param {Date} [date] — defaults to now
+ * @returns {string} e.g. 'winter2026', 'summer2027'
+ */
+export function computeCurrentTerm(date = new Date()) {
+    const year = date.getFullYear();
+    const cutoffMar15 = new Date(year, 2, 15);
+    const cutoffSep15 = new Date(year, 8, 15);
 
+    if (date < cutoffMar15) return `summer${year}`;
+    if (date < cutoffSep15) return `winter${year}`;
+    return `summer${year + 1}`;
+}
+
+export const currentTerm = computeCurrentTerm();
+
+// Exam dates below are null pending LPAB's March 2027 exam timetable, which is
+// published closer to the exam period (5–12 Mar 2027 per the Summer 2026/27
+// term calendar). Update each subject's `exam` field once the timetable is out.
 export const subjects = [
     // ── CORE (sequential, IDs 01–11) ──────────────────────────────────────────
-    { id: '01', name: 'Foundations of Law',          group: 'core',        type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Wednesday', exam: '8 Sep 2026, 9.00 am' },
-    { id: '02', name: 'Criminal Law & Procedure',    group: 'core',        type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Tuesday',   exam: '4 Sep 2026, 9.00 am' },
-    { id: '03', name: 'Torts',                       group: 'core',        type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Monday',    exam: '9 Sep 2026, 9.00 am' },
-    { id: '04', name: 'Contracts',                   group: 'core',        type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Tuesday',   exam: '7 Sep 2026, 1.45 pm' },
-    { id: '05', name: 'Real Property',               group: 'core',        type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Thursday',  exam: '10 Sep 2026, 9.00 am' },
-    { id: '06', name: 'Australian Constitutional Law', group: 'core',      type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Tuesday',   exam: '3 Sep 2026, 9.00 am' },
-    { id: '07', name: 'Equity',                      group: 'core',        type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Monday',    exam: '7 Sep 2026, 9.00 am' },
-    { id: '08', name: 'Commercial Transactions',     group: 'core',        type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Tuesday',   exam: '4 Sep 2026, 1.45 pm' },
-    { id: '09', name: 'Administrative Law',          group: 'core',        type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Wednesday', exam: '3 Sep 2026, 1.45 pm' },
-    { id: '10', name: 'Law of Associations',         group: 'core',        type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Thursday',  exam: '9 Sep 2026, 1.45 pm' },
-    { id: '11', name: 'Evidence',                    group: 'core',        type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Monday',    exam: '8 Sep 2026, 1.45 pm' },
+    { id: '01', name: 'Foundations of Law',          group: 'core',        type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Wednesday', exam: null },
+    { id: '02', name: 'Criminal Law & Procedure',    group: 'core',        type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Tuesday',   exam: null },
+    { id: '03', name: 'Torts',                       group: 'core',        type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Monday',    exam: null },
+    { id: '04', name: 'Contracts',                   group: 'core',        type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Tuesday',   exam: null },
+    { id: '05', name: 'Real Property',               group: 'core',        type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Thursday',  exam: null },
+    { id: '06', name: 'Australian Constitutional Law', group: 'core',      type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Tuesday',   exam: null },
+    { id: '07', name: 'Equity',                      group: 'core',        type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Monday',    exam: null },
+    { id: '08', name: 'Commercial Transactions',     group: 'core',        type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Tuesday',   exam: null },
+    { id: '09', name: 'Administrative Law',          group: 'core',        type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Wednesday', exam: null },
+    { id: '10', name: 'Law of Associations',         group: 'core',        type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Thursday',  exam: null },
+    { id: '11', name: 'Evidence',                    group: 'core',        type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Monday',    exam: null },
 
     // ── COMPULSORY (any order) ─────────────────────────────────────────────────
-    { id: '12', name: 'Taxation & Revenue Law',      group: 'compulsory',  type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Tuesday',   exam: '7 Sep 2026, 9.00 am' },
-    { id: '13', name: 'Succession',                  group: 'compulsory',  type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Wednesday', exam: '3 Sep 2026, 1.45 pm' },
-    { id: '14', name: 'Conveyancing',                group: 'compulsory',  type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Monday',    exam: '9 Sep 2026, 9.00 am' },
-    { id: '15', name: 'Practice & Procedure',        group: 'compulsory',  type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Thursday',  exam: '4 Sep 2026, 1.45 pm' },
-    { id: '17', name: 'Legal Ethics',                group: 'compulsory',  type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Wednesday', exam: '10 Sep 2026, 1.45 pm' },
-    { id: '24', name: 'Jurisprudence',               group: 'compulsory',  type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Thursday',  exam: '9 Sep 2026, 1.45 pm' },
+    { id: '12', name: 'Taxation & Revenue Law',      group: 'compulsory',  type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Tuesday',   exam: null },
+    { id: '13', name: 'Succession',                  group: 'compulsory',  type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Wednesday', exam: null },
+    { id: '14', name: 'Conveyancing',                group: 'compulsory',  type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Monday',    exam: null },
+    { id: '15', name: 'Practice & Procedure',        group: 'compulsory',  type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Thursday',  exam: null },
+    { id: '17', name: 'Legal Ethics',                group: 'compulsory',  type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Wednesday', exam: null },
+    { id: '24', name: 'Jurisprudence',               group: 'compulsory',  type: 'Compulsory', terms: ['Winter', 'Summer'], lecture: 'Thursday',  exam: null },
 
     // ── ELECTIVE (choose 3) ────────────────────────────────────────────────────
-    { id: '16', name: 'Insolvency',                          group: 'elective', type: 'Elective', terms: ['Winter'],           lecture: 'Wednesday', exam: '7 Sep 2026, 1.45 pm' },
+    { id: '16', name: 'Insolvency',                          group: 'elective', type: 'Elective', terms: ['Winter'],           lecture: 'Wednesday', exam: null },
     { id: '18', name: 'Conflict of Laws',                    group: 'elective', type: 'Elective', terms: ['Summer'],           lecture: 'Thursday',  exam: null },
     { id: '19', name: 'Family Law',                          group: 'elective', type: 'Elective', terms: ['Summer'],           lecture: 'Wednesday', exam: null },
-    { id: '20', name: 'Planning & Environmental Law',        group: 'elective', type: 'Elective', terms: ['Winter'],           lecture: 'Thursday',  exam: '4 Sep 2026, 9.00 am' },
+    { id: '20', name: 'Planning & Environmental Law',        group: 'elective', type: 'Elective', terms: ['Winter'],           lecture: 'Thursday',  exam: null },
     { id: '21', name: 'Industrial Law',                      group: 'elective', type: 'Elective', terms: ['Summer'],           lecture: 'Monday',    exam: null },
-    { id: '22', name: 'Intellectual Property',               group: 'elective', type: 'Elective', terms: ['Winter'],           lecture: 'Tuesday',   exam: '8 Sep 2026, 9.00 am' },
-    { id: '23', name: 'Public International Law',            group: 'elective', type: 'Elective', terms: ['Winter'],           lecture: 'Thursday',  exam: '8 Sep 2026, 1.45 pm' },
+    { id: '22', name: 'Intellectual Property',               group: 'elective', type: 'Elective', terms: ['Winter'],           lecture: 'Tuesday',   exam: null },
+    { id: '23', name: 'Public International Law',            group: 'elective', type: 'Elective', terms: ['Winter'],           lecture: 'Thursday',  exam: null },
     { id: '25', name: 'Competition & Consumer Law',          group: 'elective', type: 'Elective', terms: ['Summer'],           lecture: 'Tuesday',   exam: null },
-    { id: '26', name: 'Advanced Statutory Interpretation',   group: 'elective', type: 'Elective', terms: ['Winter'],           lecture: 'Monday',    exam: '10 Sep 2026, 9.00 am' },
+    { id: '26', name: 'Advanced Statutory Interpretation',   group: 'elective', type: 'Elective', terms: ['Winter'],           lecture: 'Monday',    exam: null },
     { id: '27', name: 'Health Law',                          group: 'elective', type: 'Elective', terms: ['Summer'],           lecture: 'Monday',    exam: null },
 ];
