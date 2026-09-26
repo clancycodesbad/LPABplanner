@@ -1,0 +1,26 @@
+RED
+--- Test output for BUG-004 red phase ---
+Command: node --test --test-name-pattern="BUG-004" quality/test_regression.mjs
+Exit code: 0
+TAP version 13
+# Subtest: BUG-004: markdown export sorts semesters alphabetically, not chronologically
+    # Subtest: BUG-004: export ordering disagrees with chronological order for a plan spanning certain year boundaries (documents open bug)
+    ok 1 - BUG-004: export ordering disagrees with chronological order for a plan spanning certain year boundaries (documents open bug)
+      ---
+      duration_ms: 0.7754
+      ...
+    1..1
+ok 1 - BUG-004: markdown export sorts semesters alphabetically, not chronologically
+  ---
+  duration_ms: 1.4169
+  type: 'suite'
+  ...
+1..1
+# tests 1
+# suites 1
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 89.1064

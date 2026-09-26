@@ -1,0 +1,26 @@
+RED
+--- Test output for BUG-005 red phase ---
+Command: node --test --test-name-pattern="BUG-005" quality/test_regression.mjs
+Exit code: 0
+TAP version 13
+# Subtest: BUG-005: drag-and-drop remove-before-validate causes silent subject loss
+    # Subtest: BUG-005: removeSubject + failed addSubject leaves no trace of the subject anywhere (documents open bug)
+    ok 1 - BUG-005: removeSubject + failed addSubject leaves no trace of the subject anywhere (documents open bug)
+      ---
+      duration_ms: 0.5009
+      ...
+    1..1
+ok 1 - BUG-005: drag-and-drop remove-before-validate causes silent subject loss
+  ---
+  duration_ms: 1.1295
+  type: 'suite'
+  ...
+1..1
+# tests 1
+# suites 1
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 87.4563

@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.1",
+  "skill_version": "1.5.6",
+  "date": "2026-09-26",
+  "project": "LPABplanner",
+  "bugs": [
+    {
+      "id": "BUG-001",
+      "requirement": "REQ-006",
+      "red_phase": "fail",
+      "green_phase": "skipped",
+      "verdict": "confirmed open",
+      "regression_patch": null,
+      "fix_patch": null,
+      "fix_patch_present": false,
+      "patch_gate_passed": null,
+      "writeup_path": "quality/writeups/BUG-001.md",
+      "junit_available": false,
+      "notes": "Fix withheld pending human product decision (QUALITY.md Human Gate) on whether current-term-only exam-clash scoping is intentional."
+    },
+    {
+      "id": "BUG-002",
+      "requirement": "REQ-017",
+      "red_phase": "fail",
+      "green_phase": "skipped",
+      "verdict": "confirmed open",
+      "regression_patch": null,
+      "fix_patch": null,
+      "fix_patch_present": false,
+      "patch_gate_passed": null,
+      "writeup_path": "quality/writeups/BUG-002.md",
+      "junit_available": false,
+      "notes": "Proposed diff in writeup; UX presentation for surfaced failures is a maintainer decision, not mechanically validated as an applied patch."
+    },
+    {
+      "id": "BUG-003",
+      "requirement": "REQ-020",
+      "red_phase": "fail",
+      "green_phase": "skipped",
+      "verdict": "confirmed open",
+      "regression_patch": null,
+      "fix_patch": null,
+      "fix_patch_present": false,
+      "patch_gate_passed": null,
+      "writeup_path": "quality/writeups/BUG-003.md",
+      "junit_available": false,
+      "notes": "Proposed diff in writeup covers only the current-term display branch; historical-archive branch needs an equivalent guard. Design decision on warning UX deferred to maintainer."
+    },
+    {
+      "id": "BUG-004",
+      "requirement": "REQ-021",
+      "red_phase": "fail",
+      "green_phase": "pass",
+      "verdict": "TDD verified",
+      "regression_patch": null,
+      "fix_patch": "quality/patches/BUG-004-fix.patch",
+      "fix_patch_present": true,
+      "patch_gate_passed": true,
+      "writeup_path": "quality/writeups/BUG-004.md",
+      "junit_available": false,
+      "notes": "Patch validated via git apply --check + isolated worktree + node --check; sort logic independently verified to produce chronological order. Patch was reverted after validation per the Phase 5 source-edit guardrail — never applied to the working tree."
+    },
+    {
+      "id": "BUG-005",
+      "requirement": "REQ-013",
+      "red_phase": "fail",
+      "green_phase": "skipped",
+      "verdict": "confirmed open",
+      "regression_patch": null,
+      "fix_patch": null,
+      "fix_patch_present": false,
+      "patch_gate_passed": null,
+      "writeup_path": "quality/writeups/BUG-005.md",
+      "junit_available": false,
+      "notes": "Fix must be applied identically to ui-board.js and ui-touch-dnd.js; proposed diff for ui-board.js only included in writeup, not mechanically validated given the cross-file scope."
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "verified": 1,
+    "confirmed_open": 4,
+    "red_failed": 0,
+    "green_failed": 0
+  }
+}

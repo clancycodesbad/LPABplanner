@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.5.6",
+  "generated_at": "2026-09-26T17:30:00Z",
+  "records": [
+    {
+      "id": "BUG-001",
+      "divergence_description": "Exam-clash detection only runs for the current term; lecture-clash detection in the same function runs for every term.",
+      "documented_intent": "README: 'automatically detects lecture and exam timetabling clashes' (no term-scoping caveat).",
+      "code_behavior": "engine.js:81 gates the exam-clash branch on semesterId === currentTerm; the lecture-clash branch (engine.js:72-79) has no such gate.",
+      "disposition": "deferred",
+      "disposition_rationale": "Whether this scoping is intentional (future timetables not reliable enough to warn on) or an oversight requires a maintainer/product decision per QUALITY.md's Human Gate; code review found no justification in comments, commits, or docs, but cannot rule out an unstated intentional design choice.",
+      "req_id": "REQ-006",
+      "proposed_fix": "Documented in quality/writeups/BUG-001.md as a proposed one-line change; not applied pending the human decision.",
+      "fix_type": "code",
+      "severity": "HIGH"
+    },
+    {
+      "id": "BUG-002",
+      "divergence_description": "Onboarding's automated batch subject-placement calls discard addSubject's failure result, unlike the manual drag-and-drop path which surfaces failures.",
+      "documented_intent": "Inferred from the existing, already-implemented error-surfacing pattern in ui-board.js's handleAddSubject for the identical addSubject call.",
+      "code_behavior": "ui-onboarding.js:157-165 (applyPathway) and ui-onboarding.js:220-226 (Path B confirm) call PlannerState.addSubject in a loop without checking the returned {success, errors}.",
+      "disposition": "code-fix",
+      "disposition_rationale": "This is a straightforward missing-error-handling defect, not a spec ambiguity — the fix is to capture and surface the result, matching the already-established pattern used elsewhere in the same codebase; the only open question is UX presentation, not whether to fix it.",
+      "req_id": "REQ-017",
+      "proposed_fix": "Documented in quality/writeups/BUG-002.md as a proposed diff; not mechanically validated as an applied patch since UX phrasing is a maintainer decision.",
+      "fix_type": "code",
+      "severity": "MEDIUM"
+    },
+    {
+      "id": "BUG-003",
+      "divergence_description": "The exam-date display layer never validates through the strict parser used by clash detection, so malformed exam strings display as valid while being invisible to clash checks.",
+      "documented_intent": "README: 'Exam date format is strict — datetime.js expects [format]. Do not change this format... without updating the parser.'",
+      "code_behavior": "ui-board.js:19-43 (getExamText) uses subject.exam directly based on truthiness; js/utils/datetime.js's parseExamDate is never called from the UI layer (confirmed via grep).",
+      "disposition": "code-fix",
+      "disposition_rationale": "The README's own strictness statement implies malformed data should be detectable; the code today has no detection mechanism visible to the user, which is a gap in the code rather than a spec ambiguity — though the exact remediation approach (visible warning vs. load-time validation) is a design choice.",
+      "req_id": "REQ-020",
+      "proposed_fix": "Documented in quality/writeups/BUG-003.md as a proposed diff; not mechanically validated as an applied patch.",
+      "fix_type": "code",
+      "severity": "MEDIUM"
+    },
+    {
+      "id": "BUG-004",
+      "divergence_description": "Markdown export sorts semesters alphabetically rather than chronologically, disagreeing with the app's own on-screen board ordering.",
+      "documented_intent": "README: 'Markdown export — One-click copy of the full plan'; the app's own board rendering (ui-board.js) establishes chronological order as the internal baseline.",
+      "code_behavior": "ui-toolbar.js:26 uses Object.keys(plan).filter(...).sort() — a plain lexicographic sort with no chronological comparator.",
+      "disposition": "code-fix",
+      "disposition_rationale": "This is an unambiguous code defect with a safe, low-risk, mechanically-validated fix — no design decision is required.",
+      "req_id": "REQ-021",
+      "proposed_fix": "quality/patches/BUG-004-fix.patch",
+      "fix_type": "code",
+      "severity": "MEDIUM"
+    },
+    {
+      "id": "BUG-005",
+      "divergence_description": "Both drag-and-drop implementations (native mouse and touch) remove a subject from its source semester before validating the target add, with no rollback on failure, causing silent data loss.",
+      "documented_intent": "Inferred from REQ-013's autosave/persistence guarantee ('every successful mutation persists... so I never lose my planning work') — the spirit of never silently losing planned work.",
+      "code_behavior": "ui-board.js:215-228 (handleDrop) and ui-touch-dnd.js:123-144 (onPointerUp) both call PlannerState.removeSubject on the source before calling handleAddSubject/PlannerState.addSubject on the target, with no success check or rollback.",
+      "disposition": "code-fix",
+      "disposition_rationale": "This is a clear code defect (missing validate-before-remove ordering), not a spec ambiguity; the fix must be applied identically to both parallel DnD implementations, which is why a fully mechanically-validated patch was deferred to a future pass rather than rushed within this run's scope.",
+      "req_id": "REQ-013",
+      "proposed_fix": "Documented in quality/writeups/BUG-005.md as a proposed diff for ui-board.js, with an explicit note that ui-touch-dnd.js requires the identical change.",
+      "fix_type": "code",
+      "severity": "HIGH"
+    }
+  ]
+}

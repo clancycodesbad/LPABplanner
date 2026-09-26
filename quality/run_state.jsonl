@@ -1,0 +1,27 @@
+{"event":"_index","ts":"2026-09-26T16:00:19Z","schema_version":"1.5.6","event_types":["_index","run_start","phase_start","pattern_walked","pass_started","pass_ended","finding_logged","artifact_written","gate_check","phase_end","error","run_end"],"benchmark":"LPABplanner","lever_state":"baseline","started_at":"2026-09-26T16:00:19Z"}
+{"event":"run_start","ts":"2026-09-26T16:00:19Z","runner":"claude","playbook_version":"1.5.6","target_path":"C:\Dev\LPABplanner"}
+{"event":"phase_start","ts":"2026-09-26T16:00:19Z","phase":1}
+{"event":"pattern_walked","ts":"2026-09-26T16:15:00Z","phase":1,"pattern":1,"findings_count":10}
+{"event":"pattern_walked","ts":"2026-09-26T16:16:00Z","phase":1,"pattern":2,"findings_count":5}
+{"event":"pattern_walked","ts":"2026-09-26T16:17:00Z","phase":1,"pattern":3,"findings_count":3}
+{"event":"artifact_written","ts":"2026-09-26T16:18:00Z","relative_path":"quality/EXPLORATION.md","byte_size":24000,"line_count":340}
+{"event":"phase_end","ts":"2026-09-26T16:20:00Z","phase":1,"key_counts":{"open_findings":10,"quality_risks":5,"candidate_bugs":5},"artifacts_produced":["quality/EXPLORATION.md","quality/exploration_role_map.json","quality/formal_docs_manifest.json","quality/PROGRESS.md"]}
+{"event":"phase_start","ts":"2026-09-26T16:20:30Z","phase":2}
+{"event":"artifact_written","ts":"2026-09-26T16:50:00Z","relative_path":"quality/REQUIREMENTS.md","byte_size":30141,"line_count":300}
+{"event":"artifact_written","ts":"2026-09-26T16:50:00Z","relative_path":"quality/test_functional.mjs","byte_size":22313,"line_count":350}
+{"event":"phase_end","ts":"2026-09-26T16:55:00Z","phase":2,"key_counts":{"requirements":21,"contracts":84,"use_cases":8,"functional_tests_passing":47,"functional_tests_total":47},"artifacts_produced":["quality/QUALITY.md","quality/REQUIREMENTS.md","quality/CONTRACTS.md","quality/COVERAGE_MATRIX.md","quality/COMPLETENESS_REPORT.md","quality/test_functional.mjs","quality/RUN_CODE_REVIEW.md","quality/RUN_INTEGRATION_TESTS.md","quality/RUN_SPEC_AUDIT.md","quality/RUN_TDD_TESTS.md","quality/requirements_manifest.json","quality/use_cases_manifest.json"]}
+{"event":"phase_start","ts":"2026-09-26T16:55:30Z","phase":3}
+{"event":"phase_end","ts":"2026-09-26T17:35:00Z","phase":3,"key_counts":{"bugs_confirmed":5,"regression_tests":5,"fix_patches_validated":1},"artifacts_produced":["quality/code_reviews/pass1-structural.md","quality/code_reviews/pass2-requirements.md","quality/code_reviews/pass3-consistency.md","quality/test_regression.mjs","quality/BUGS.md","quality/bugs_manifest.json","quality/writeups/BUG-001.md","quality/writeups/BUG-002.md","quality/writeups/BUG-003.md","quality/writeups/BUG-004.md","quality/writeups/BUG-005.md","quality/patches/BUG-004-fix.patch","quality/results/tdd-results.json"]}
+{"event":"phase_start","ts":"2026-09-26T17:36:00Z","phase":4}
+{"event":"pass_started","ts":"2026-09-26T17:40:00Z","phase":4,"pass":"auditor-1"}
+{"event":"pass_ended","ts":"2026-09-26T17:45:00Z","phase":4,"pass":"auditor-1","output_artifact":"quality/spec_audits/2026-09-26-auditor-1.md"}
+{"event":"phase_end","ts":"2026-09-26T17:50:00Z","phase":4,"key_counts":{"council_complete":1,"council_planned":3,"net_new_bugs":0,"minority_findings":1},"artifacts_produced":["quality/spec_audits/2026-09-26-auditor-1.md","quality/spec_audits/EXTERNAL_AUDIT_PROMPT_gemini-pro.md","quality/spec_audits/EXTERNAL_AUDIT_PROMPT_gpt-5.1.md","quality/spec_audits/2026-09-26-triage.md","quality/citation_semantic_check.json"]}
+{"event":"phase_start","ts":"2026-09-26T17:51:00Z","phase":5}
+{"event":"gate_check","ts":"2026-09-26T17:55:00Z","gate_name":"challenge_gate","verdict":"pass","reason":"all 5 bugs confirmed, no downgrades or rejections"}
+{"event":"gate_check","ts":"2026-09-26T17:56:00Z","gate_name":"tdd_sidecar_log_consistency","verdict":"pass","reason":"all red/green logs match sidecar verdicts"}
+{"event":"gate_check","ts":"2026-09-26T17:57:00Z","gate_name":"terminal_gate_bug_count","verdict":"pass","reason":"5 tracker entries = 5 confirmed + 0 net-new, counts reconcile"}
+{"event":"gate_check","ts":"2026-09-26T17:58:00Z","gate_name":"bugs_md_heading_format","verdict":"pass","reason":"all 5 entries use ### BUG-NNN format"}
+{"event":"phase_end","ts":"2026-09-26T18:00:00Z","phase":5,"key_counts":{"bugs_closed":5,"tdd_verified":1,"confirmed_open":4},"artifacts_produced":["quality/challenge/BUG-001-challenge.md","quality/challenge/BUG-002-challenge.md","quality/challenge/BUG-003-challenge.md","quality/challenge/BUG-004-challenge.md","quality/challenge/BUG-005-challenge.md","quality/TDD_TRACEABILITY.md","quality/COMPLETENESS_REPORT.md"]}
+{"event":"phase_start","ts":"2026-09-26T18:01:00Z","phase":6}
+{"event":"phase_end","ts":"2026-09-26T18:10:00Z","phase":6,"key_counts":{"functional_tests_pass":47,"regression_tests_pass":5},"artifacts_produced":["quality/results/phase6-verification.log","quality/INDEX.md"]}
+{"event":"run_end","ts":"2026-09-26T18:10:30Z","status":"success","total_findings":5,"final_verdict":"PASS WITH FLAGGED PARTIAL-COUNCIL CAVEAT"}
