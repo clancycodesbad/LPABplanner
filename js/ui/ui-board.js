@@ -214,16 +214,32 @@ function createSubjectSlot(subject, semesterId, subjectWarnings) {
     return slot;
 }
 
+/**
+ * Move a subject from one semester slot to another (or from the pool).
+ * Validates the target BEFORE removing from the source, so a rejected
+ * move never loses the subject — it stays exactly where it was.
+ */
+export function attemptMove(subject, sourceId, targetId) {
+    const isMove = sourceId !== 'pool' && sourceId !== targetId;
+    if (isMove && targetId !== 'completed') {
+        const targetList = PlannerState.getSemester(targetId);
+        const errors = Engine.validateSemester(targetList, subject, targetId);
+        if (errors.length > 0) {
+            handleAddSubject(subject, targetId); // reuses the existing error-banner/toast UI, no removal happened
+            return;
+        }
+    }
+    if (isMove) PlannerState.removeSubject(sourceId, subject.id);
+    handleAddSubject(subject, targetId);
+}
+
 function handleDrop(event, targetSemesterId) {
     event.preventDefault();
     try {
         const data = JSON.parse(event.dataTransfer.getData('text/plain'));
         const subject = subjects.find(s => s.id === data.id);
         if (!subject) return;
-        if (data.source !== 'pool' && data.source !== targetSemesterId) {
-            PlannerState.removeSubject(data.source, data.id);
-        }
-        handleAddSubject(subject, targetSemesterId);
+        attemptMove(subject, data.source, targetSemesterId);
     } catch (err) {
         console.error('Drop failed:', err);
     }

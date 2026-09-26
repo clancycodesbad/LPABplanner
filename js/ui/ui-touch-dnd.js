@@ -3,8 +3,7 @@
 // Called after every render from ui-board.js and ui-pool.js.
 
 import { subjects } from '../../subjects.js';
-import { PlannerState } from '../../planner.js';
-import { handleAddSubject } from './ui-board.js';
+import { attemptMove } from './ui-board.js';
 
 // ─── State ──────────────────────────────────────────────────────
 let dragState = null; // { subjectId, sourceId, ghost, originEl }
@@ -132,11 +131,7 @@ function onPointerUp(e) {
     if (target) {
         const targetSemId = semesterIdFromContainer(target);
         if (targetSemId) {
-            // Remove from source if it was on the board (not pool)
-            if (dragState.sourceId !== 'pool' && dragState.sourceId !== targetSemId) {
-                PlannerState.removeSubject(dragState.sourceId, dragState.subjectId);
-            }
-            handleAddSubject(dragState.subject, targetSemId);
+            attemptMove(dragState.subject, dragState.sourceId, targetSemId);
         }
     }
 
