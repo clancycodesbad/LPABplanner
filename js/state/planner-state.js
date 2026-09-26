@@ -10,13 +10,27 @@
  */
 
 import { Engine } from '../../engine.js';
-import { currentTerm } from '../../subjects.js';
+import { currentTerm, subjects } from '../../subjects.js';
 import {
     loadPlan, savePlan, clearPlanOnly,
     loadHiddenSubjects, saveHiddenSubjects
 } from './storage.js';
 
-let _plan = loadPlan();
+/**
+ * Saved plans hold a snapshot of each subject from the day it was placed.
+ * Swap each one for the live entry in subjects.js so exam dates, lecture
+ * nights and names always reflect the current data, not a past term's.
+ * A subject no longer in the catalogue keeps its saved copy.
+ */
+function refreshSubjects(plan) {
+    for (const semesterId of Object.keys(plan)) {
+        plan[semesterId] = plan[semesterId].map(saved =>
+            subjects.find(s => s.id === saved.id) ?? saved);
+    }
+    return plan;
+}
+
+let _plan = refreshSubjects(loadPlan());
 let _hidden = loadHiddenSubjects(); // string[] of subject IDs
 
 export const PlannerState = {
