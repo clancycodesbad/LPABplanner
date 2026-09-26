@@ -23,7 +23,7 @@ function handleExport() {
         text += '\n';
     }
 
-    Object.keys(plan).filter(k => k !== 'completed').sort().forEach(term => {
+    Object.keys(plan).filter(k => k !== 'completed').sort(compareTermsChronologically).forEach(term => {
         const termName = term.replace('winter', 'Winter ').replace('summer', 'Summer ');
         text += `## ${termName}\n`;
         (plan[term] || []).forEach(s => {
@@ -35,6 +35,17 @@ function handleExport() {
     navigator.clipboard.writeText(text)
         .then(() => showToast('Plan copied to clipboard!'))
         .catch(() => showToast('Could not copy — please try again.', true));
+}
+
+/**
+ * Order term IDs (e.g. 'winter2029', 'summer2030') by real calendar time,
+ * matching the sequence the board itself renders semesters in. Summer
+ * (March exams) precedes Winter (Sep exams) within the same year.
+ */
+function compareTermsChronologically(a, b) {
+    const yearOf = term => parseInt(term.match(/\d{4}/)[0], 10);
+    const rankOf = term => (term.startsWith('summer') ? 0 : 1);
+    return (yearOf(a) * 10 + rankOf(a)) - (yearOf(b) * 10 + rankOf(b));
 }
 
 function handleReset() {
