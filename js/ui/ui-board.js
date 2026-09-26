@@ -3,7 +3,7 @@ import { subjects, currentTerm } from '../../subjects.js';
 import { historicalExams } from '../../archive.js';
 import { parseExamDate } from '../utils/datetime.js';
 import { PlannerState } from '../../planner.js';
-import { Engine } from '../../engine.js';
+import { Engine, POSSIBLE_EXAM_CLASH } from '../../engine.js';
 import { renderSubjectPool } from './ui-pool.js';
 import { renderProgress } from './ui-progress.js';
 import { feedbackPanel, errorListEl } from './ui-main.js';
@@ -153,13 +153,18 @@ export function renderPlannerBoard() {
 
 function createSubjectSlot(subject, semesterId, subjectWarnings) {
     const slot = document.createElement('div');
-    const isClashing = subjectWarnings && subjectWarnings.length > 0;
+    const warnings = subjectWarnings || [];
+    const hardClashes = warnings.filter(w => w !== POSSIBLE_EXAM_CLASH);
+    const possibleClashes = warnings.filter(w => w === POSSIBLE_EXAM_CLASH);
     const sType = subject.type.toLowerCase();
     const groupClass = subject.group === 'core' ? 'slot--core' :
                        sType === 'compulsory'    ? 'slot--compulsory' :
                                                    'slot--elective';
+    const stateClass = hardClashes.length > 0 ? 'slot--clash' :
+                       possibleClashes.length > 0 ? 'slot--warning' :
+                                                    groupClass;
 
-    slot.className = `slot ${isClashing ? 'slot--clash' : groupClass}`;
+    slot.className = `slot ${stateClass}`;
     slot.draggable = true;
     // Data attributes for touch DnD
     slot.dataset.subjectId = subject.id;
@@ -186,9 +191,8 @@ function createSubjectSlot(subject, semesterId, subjectWarnings) {
         ? `<div class="slot__exam">${getExamText(subject, semesterId)}</div>` : '';
 
     let clashWarningHtml = '';
-    if (isClashing) {
-        subjectWarnings.forEach(w => { clashWarningHtml += `<div class="slot__clash-warning">⚠️ ${w}</div>`; });
-    }
+    hardClashes.forEach(w => { clashWarningHtml += `<div class="slot__clash-warning">⚠️ ${w}</div>`; });
+    possibleClashes.forEach(w => { clashWarningHtml += `<div class="slot__warning-msg">🕒 ${w}</div>`; });
 
     const groupLabel = subject.group === 'core' ? 'Core' :
                        subject.group === 'compulsory' ? 'Compulsory' : 'Elective';

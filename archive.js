@@ -1,5 +1,8 @@
 // Add past semesters here chronologically (oldest at the top, newest at the bottom).
 // The system will read this file backwards to find the most recent exam date.
+// Each term's entries are also compared against each other to flag pairs of
+// subjects that shared an exam slot as possible clashes in future semesters,
+// so include every subject examined that term.
 
 export const historicalExams = {
     'summer2025': [
