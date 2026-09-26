@@ -12,8 +12,8 @@ unashamedly vibe coded, because i sure as hell couldnt do it otherwise.
 
 - **Drag-and-drop interface** — Move subjects from the pool into semesters or the Already Completed section
 - **Graduation tracker** — Real-time progress bars for compulsory subjects and electives
-- **Clash detection** — Warns when two subjects in the same active semester share a lecture night or exam time
-- **Historical exam archive** — Subjects placed in future semesters show their last known exam date from `archive.js`
+- **Clash detection** — Warns when two subjects in the same semester share a lecture night. In the current semester, once its exam timetable is published, warns when two subjects share an exam time. In any other semester, flags a possible exam clash when the pair has shared an exam slot in a published timetable before
+- **Historical exam archive** — Subjects placed in future semesters show their last known exam date from `archive.js`, and past timetables in `archive.js` drive the possible-clash warnings
 - **Auto-save** — Plan is saved to `localStorage` and persists across page reloads
 - **Markdown export** — One-click copy of the full plan, formatted for Notion, Obsidian, or similar tools
 - **Print view** — `Ctrl+P` / `Cmd+P` hides the UI and formats the plan for A4 or PDF
@@ -78,7 +78,7 @@ LPABplanner/
 |---|---|---|
 | `subjects.js` | Subject list, `currentTerm` | Nothing |
 | `archive.js` | Historical exam data | Nothing |
-| `engine.js` | Validation, clash detection | `subjects.js`, `datetime.js` |
+| `engine.js` | Validation, clash detection | `subjects.js`, `archive.js`, `datetime.js` |
 | `js/state/storage.js` | localStorage only | Nothing |
 | `js/state/planner-state.js` | Plan mutations | `engine.js`, `storage.js`, `subjects.js` |
 | `js/utils/datetime.js` | Date parsing + comparison | Nothing |
@@ -97,7 +97,7 @@ When the LPAB releases a new Evening Lecture Schedule and Examination Timetable,
 
 ### Step 1 — Archive the outgoing semester
 
-In `archive.js`, add an entry for the semester that just ended. This preserves its exam dates so the planner can show "Last ran" information for future semesters.
+In `archive.js`, add an entry for the semester that just ended, with every subject that was examined that term. This preserves its exam dates so the planner can show "Last ran" information for future semesters, and lets it flag pairs of subjects that shared an exam slot as possible clashes in later semesters.
 
 ```js
 // archive.js
@@ -111,14 +111,9 @@ export const historicalExams = {
 };
 ```
 
-### Step 2 — Update `currentTerm`
+### Step 2 — Check `currentTerm` (no edit needed)
 
-In `subjects.js`, update the exported `currentTerm` to the new active semester. The engine uses this to decide which semester to run exam clash detection against.
-
-```js
-// subjects.js
-export const currentTerm = 'summer2026'; // ← update this
-```
+`currentTerm` in `subjects.js` is worked out from today's date by `computeCurrentTerm()`: it moves to the next semester on 15 March and 15 September, just after each exam period ends. You don't need to change it. Exam dates in `subjects.js` are always read as belonging to `currentTerm`.
 
 ### Step 3 — Update the subject timetable
 
@@ -137,7 +132,8 @@ In `subjects.js`, update each subject's `lecture` and `exam` fields from the new
 
 - If a subject is **not offered** in the new term, set `exam: null`. The engine will skip it for clash detection and show its archived date instead.
 - The `terms` array (`['Winter']`, `['Summer']`, or `['Winter', 'Summer']`) controls which semesters a subject can be added to. Update this if LPAB changes availability.
-- Exam date format must be `'D Mon YYYY, H.MM am/pm'` (e.g., `'3 Mar 2027, 9.00 am'`). This is what `datetime.js` parses — any other format will log a warning and be treated as no exam.
+- Exam date format must be `'D Mon YYYY, H.MM am/pm'` (e.g., `'3 Mar 2027, 9.00 am'`). This is what `datetime.js` parses — any other format shows as "Exam date unrecognized" on the board and is left out of clash detection.
+- Until the new exam timetable is published, leave every `exam` as `null`. The board shows "Last ran" dates from `archive.js`, and possible clashes are flagged from past timetables.
 
 ---
 
