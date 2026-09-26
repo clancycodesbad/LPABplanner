@@ -1,6 +1,7 @@
 // ui-board.js — planner board, semester cards, subject slots, drag-and-drop
 import { subjects, currentTerm } from '../../subjects.js';
 import { historicalExams } from '../../archive.js';
+import { parseExamDate } from '../utils/datetime.js';
 import { PlannerState } from '../../planner.js';
 import { Engine } from '../../engine.js';
 import { renderSubjectPool } from './ui-pool.js';
@@ -18,21 +19,22 @@ const isTouchPrimary = window.matchMedia('(hover: none) and (pointer: coarse)').
 
 export function getExamText(subject, semesterId) {
     if (semesterId === 'completed') return '';
-    const safeTerm = typeof currentTerm !== 'undefined' ? currentTerm : 'winter2026';
 
-    if (semesterId === safeTerm) {
-        return subject.exam ? `📝 Exam: ${subject.exam}` : '📝 Exam: TBA';
+    if (semesterId === currentTerm) {
+        if (!subject.exam) return '📝 Exam: TBA';
+        if (!parseExamDate(subject.exam)) return `⚠️ Exam date unrecognized: "${subject.exam}"`;
+        return `📝 Exam: ${subject.exam}`;
     }
 
     let lastKnown = null;
-    if (subject.exam) {
-        const termName = safeTerm.replace('winter','Winter ').replace('summer','Summer ');
+    if (subject.exam && parseExamDate(subject.exam)) {
+        const termName = currentTerm.replace('winter','Winter ').replace('summer','Summer ');
         lastKnown = `${subject.exam} (${termName})`;
     } else if (typeof historicalExams !== 'undefined') {
         const pastTerms = Object.keys(historicalExams).reverse();
         for (const term of pastTerms) {
             const pastSub = historicalExams[term].find(s => s.id === subject.id);
-            if (pastSub && pastSub.exam) {
+            if (pastSub && pastSub.exam && parseExamDate(pastSub.exam)) {
                 const termName = term.replace('winter','Winter ').replace('summer','Summer ');
                 lastKnown = `${pastSub.exam} (${termName})`;
                 break;
