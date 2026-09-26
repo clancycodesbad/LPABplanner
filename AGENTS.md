@@ -8,7 +8,9 @@ Because the app uses native ES6 `import`/`export`, it must be served over HTTP â
 
 - Live at `https://lpabplanner.301285.xyz`, served from plex2 (Saltbox) by an `nginx:alpine` container named `lpabplanner` on the `saltbox` Docker network, with Traefik labels in `/opt/lpabplanner/docker-compose.yml`. Public, no Authelia.
 - `/opt/lpabplanner` is a git clone of this repo on the `testing` branch, bind-mounted read-only as the web root.
+- Because the whole clone is the web root, `/opt/lpabplanner/.nginx.conf` (mounted as the container's `default.conf`) returns 404 for dot-files (including `.git/`), `docker-compose.yml`, `quality/` and all `.md` files. Keep this in place, and add any new internal folder to it.
 - To deploy: push to `testing`, then on plex2 run `cd /opt/lpabplanner && sudo git pull && sudo docker restart lpabplanner`.
+- The GitHub repo (`clancycodesbad/LPABplanner`) is public on purpose â€” an exception to the private-by-default rule.
 
 ## Structure
 
