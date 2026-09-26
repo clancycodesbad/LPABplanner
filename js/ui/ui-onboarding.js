@@ -24,6 +24,7 @@ import { subjects, currentTerm } from '../../subjects.js';
 import { PlannerState } from '../state/planner-state.js';
 import { markOnboardingDone } from '../state/storage.js';
 import { SUGGESTED_PATHWAY, generateTermSequence } from '../data/suggested-pathway.js';
+import { showToast } from './ui-toolbar.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // FIRST-RUN WIZARD  (showOnboardingIfNeeded)
@@ -155,13 +156,20 @@ function renderPathwayConfirm(overlay, onComplete) {
 }
 
 function applyPathway(terms) {
+    const failures = [];
     SUGGESTED_PATHWAY.forEach((sem, i) => {
         const termId = terms[i];
         sem.subjects.forEach(id => {
             const subject = subjects.find(s => s.id === id);
-            if (subject) PlannerState.addSubject(termId, subject);
+            if (subject) {
+                const result = PlannerState.addSubject(termId, subject);
+                if (!result.success) failures.push(subject.name);
+            }
         });
     });
+    if (failures.length > 0) {
+        showToast(`Could not place: ${failures.join(', ')}. Add them manually from the pool.`, true);
+    }
 }
 
 // ── Path B: Pick completed subjects ──────────────────────────────────────────
@@ -218,10 +226,17 @@ function renderConfirmB(overlay, onComplete, ctx) {
 
     overlay.querySelector('#ob-back').addEventListener('click',    () => showWizardStep(overlay, 'completed-pick', onComplete));
     overlay.querySelector('#ob-confirm').addEventListener('click', () => {
+        const failures = [];
         ctx.checked.forEach(id => {
             const subject = subjects.find(s => s.id === id);
-            if (subject) PlannerState.addSubject('completed', subject);
+            if (subject) {
+                const result = PlannerState.addSubject('completed', subject);
+                if (!result.success) failures.push(subject.name);
+            }
         });
+        if (failures.length > 0) {
+            showToast(`Could not mark as completed: ${failures.join(', ')}.`, true);
+        }
         finishWizard(overlay, onComplete);
     });
 }
