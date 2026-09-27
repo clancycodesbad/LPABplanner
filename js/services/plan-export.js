@@ -21,7 +21,10 @@ export function formatPlanMarkdown(plan, currentTerm) {
         text += '\n';
     }
 
-    Object.keys(plan).filter(isTermId).sort(compareTerms).forEach(term => {
+    // The board creates an empty entry for every semester it shows, so only
+    // semesters with subjects in them are exported.
+    const plannedTerms = Object.keys(plan).filter(term => isTermId(term) && plan[term].length > 0);
+    plannedTerms.sort(compareTerms).forEach(term => {
         text += `## ${formatTermLabel(term)}\n`;
         (plan[term] || []).forEach(s => {
             // Exam dates in subjects.js belong to the current term only.

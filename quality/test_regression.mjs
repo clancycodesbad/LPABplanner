@@ -163,7 +163,8 @@ describe('BUG-003 (fixed): malformed exam dates no longer display as valid', () 
 describe('BUG-004 (fixed): markdown export sorts semesters chronologically', () => {
     test('BUG-004: export ordering matches the board\'s term sequence, including within a year', () => {
         // The export (js/services/plan-export.js) against the board's sequence (termSequence).
-        const plan = { completed: [], summer2030: [], winter2030: [], summer2029: [], winter2029: [] };
+        const plan = { completed: [], summer2030: [findSubject('05')], winter2030: [findSubject('06')],
+                       summer2029: [findSubject('07')], winter2029: [findSubject('08')] };
         const exported = formatPlanMarkdown(plan, 'summer2026')
             .split('\n').filter(l => l.startsWith('## ')).map(l => l.slice(3));
         assert.deepEqual(exported, termSequence('winter2029', 4).map(formatTermLabel),
