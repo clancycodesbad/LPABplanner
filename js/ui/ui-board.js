@@ -49,7 +49,7 @@ export function handleAddSubject(subject, semesterId) {
 
     // Core order warning — non-blocking
     if (semesterId !== 'completed') {
-        const orderWarning = Engine.checkCoreOrder(subject.id, PlannerState.getPlan());
+        const orderWarning = Engine.checkCoreOrder(subject.id, semesterId, PlannerState.getPlan());
         if (orderWarning) {
             feedbackPanel.style.display = 'block';
             feedbackPanel.className = 'warning';
@@ -153,12 +153,13 @@ function createSubjectSlot(subject, semesterId, subjectWarnings) {
     const warnings = subjectWarnings || [];
     const hardClashes = warnings.filter(w => w !== POSSIBLE_EXAM_CLASH);
     const possibleClashes = warnings.filter(w => w === POSSIBLE_EXAM_CLASH);
+    const orderIssues = Engine.coreOrderIssues(subject.id, semesterId, PlannerState.getPlan());
     const sType = subject.type.toLowerCase();
     const groupClass = subject.group === 'core' ? 'slot--core' :
                        sType === 'compulsory'    ? 'slot--compulsory' :
                                                    'slot--elective';
     const stateClass = hardClashes.length > 0 ? 'slot--clash' :
-                       possibleClashes.length > 0 ? 'slot--warning' :
+                       possibleClashes.length > 0 || orderIssues ? 'slot--warning' :
                                                     groupClass;
 
     slot.className = `slot ${stateClass}`;
@@ -187,9 +188,15 @@ function createSubjectSlot(subject, semesterId, subjectWarnings) {
     const examDisplay = semesterId !== 'completed'
         ? `<div class="slot__exam">${getExamText(subject, semesterId)}</div>` : '';
 
+    // Icons are decorative: the text already says what each warning is.
+    const icon = emoji => `<span aria-hidden="true">${emoji}</span>`;
     let clashWarningHtml = '';
-    hardClashes.forEach(w => { clashWarningHtml += `<div class="slot__clash-warning">⚠️ ${w}</div>`; });
-    possibleClashes.forEach(w => { clashWarningHtml += `<div class="slot__warning-msg">🕒 ${w}</div>`; });
+    hardClashes.forEach(w => { clashWarningHtml += `<div class="slot__clash-warning">${icon('⚠️')} ${w}</div>`; });
+    possibleClashes.forEach(w => { clashWarningHtml += `<div class="slot__warning-msg">${icon('⏳')} ${w}</div>`; });
+    if (orderIssues) {
+        const takeFirst = [...orderIssues.missing, ...orderIssues.later].join(', ');
+        clashWarningHtml += `<div class="slot__warning-msg">${icon('⚠️')} Out of sequence — needs LPAB approval. Take first: ${takeFirst}.</div>`;
+    }
 
     const groupLabel = subject.group === 'core' ? 'Core' :
                        subject.group === 'compulsory' ? 'Compulsory' : 'Elective';

@@ -2,6 +2,23 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html): MAJOR for changes that break saved plans or existing behaviour, MINOR for new features, PATCH for fixes and semester data updates.
 
+## [1.4.0] - 2026-09-27
+
+### Added
+
+- Core subjects placed out of sequence keep an amber warning on their tile, naming the earlier subjects to take first, until the order is fixed.
+
+### Changed
+
+- The core-order check now accounts for timing: an earlier core subject must be completed or in the same or an earlier semester. It previously only checked it was somewhere in the plan.
+- Possible exam clashes are marked with ⏳ instead of 🕒, which "Last ran" dates also use. Warning icons are hidden from screen readers, since the text already describes each warning.
+- The help tour's "Clashes and warnings" page covers possible exam clashes and out-of-sequence subjects.
+
+### Fixed
+
+- Semesters in a saved plan with an unrecognised ID are dropped on load, returning their subjects to the pool. Previously those subjects counted towards progress but never appeared on the board.
+- The help tour no longer says subjects are greyed out for a "selected semester", which the app doesn't have.
+
 ## [1.3.1] - 2026-09-27
 
 ### Fixed
@@ -81,6 +98,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - **Subject pool disappearing after state refactor** — `ui-board.js` was accessing `PlannerState.plan` directly. After `_plan` became a private variable this returned `undefined`, causing the semester render loop to produce zero terms and the subject pool to never draw. Fixed by adding a `getPlan()` accessor to `PlannerState` and updating the one reference in `ui-board.js`. ([`d229d6f`](https://github.com/clancycodesbad/LPABplanner/commit/d229d6f1d30bb5eb6c2b91d74cae950076b86fca))
 
+[1.4.0]: https://github.com/clancycodesbad/LPABplanner/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/clancycodesbad/LPABplanner/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/clancycodesbad/LPABplanner/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/clancycodesbad/LPABplanner/compare/v1.2.0...v1.2.1

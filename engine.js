@@ -1,6 +1,7 @@
 import { examTimesClash } from './js/utils/datetime.js';
 import { subjects as allSubjects } from './subjects.js';
 import { historicalExams } from './archive.js';
+import { isTermId, compareTerms } from './js/utils/terms.js';
 
 // IDs of the 11 core subjects, in required sequence.
 const CORE_ORDER = ['01','02','03','04','05','06','07','08','09','10','11'];
@@ -32,37 +33,52 @@ export const Engine = {
     },
 
     /**
-     * Check whether a core subject is being placed out of sequence.
-     * Returns a warning string if so, or null if order is fine.
-     *
-     * A subject is "out of order" if it is placed in any semester and
-     * a core subject with a lower sequence number has not yet been added
-     * to the plan (completed or otherwise).
-     *
-     * This is a warning only — the placement is not blocked.
+     * Find the earlier core subjects that a core subject placed in
+     * `semesterId` is out of sequence with. A prerequisite is satisfied when
+     * it is completed or placed in the same or an earlier semester — the
+     * LPAB's suggested pathway takes consecutive core subjects together
+     * (01 with 02, 03 with 04), so the same semester is in order.
      *
      * @param {string} subjectId
-     * @param {object} currentPlan  — full plan object
-     * @returns {string|null}
+     * @param {string} semesterId  — term ID the subject is (or is being) placed in
+     * @param {object} plan        — full plan object
+     * @returns {{ missing: string[], later: string[] }|null}
+     *   names of prerequisites not in the plan / planned for a later
+     *   semester, or null if the placement is in sequence
      */
-    checkCoreOrder(subjectId, currentPlan) {
+    coreOrderIssues(subjectId, semesterId, plan) {
         const coreIdx = CORE_ORDER.indexOf(subjectId);
-        if (coreIdx <= 0) return null; // not a core subject, or first in sequence
+        // Not core, first in sequence, or being marked completed.
+        if (coreIdx <= 0 || !isTermId(semesterId)) return null;
 
-        const allPlanned = Object.values(currentPlan).flat().map(s => s.id);
-        const missingPrior = CORE_ORDER
-            .slice(0, coreIdx)
-            .filter(id => !allPlanned.includes(id));
+        const placedIn = {};
+        for (const [term, list] of Object.entries(plan)) {
+            if (term === 'completed' || isTermId(term)) list.forEach(s => { placedIn[s.id] = term; });
+        }
+        const nameOf = id => allSubjects.find(s => s.id === id)?.name ?? id;
 
-        if (missingPrior.length === 0) return null;
+        const missing = [];
+        const later = [];
+        for (const id of CORE_ORDER.slice(0, coreIdx)) {
+            const term = placedIn[id];
+            if (!term) missing.push(nameOf(id));
+            else if (term !== 'completed' && compareTerms(term, semesterId) > 0) later.push(nameOf(id));
+        }
+        return missing.length || later.length ? { missing, later } : null;
+    },
 
-        const missingNames = missingPrior.map(id => {
-            const s = allSubjects.find(sub => sub.id === id);
-            return s ? s.name : id;
-        });
+    /**
+     * Warning text for a core subject placed out of sequence, or null if it
+     * is in order. This is a warning only — the placement is not blocked.
+     */
+    checkCoreOrder(subjectId, semesterId, plan) {
+        const issues = this.coreOrderIssues(subjectId, semesterId, plan);
+        if (!issues) return null;
 
-        return `Taking this subject out of the recommended sequence requires LPAB approval. ` +
-               `Prerequisite(s) not yet in plan: ${missingNames.join(', ')}.`;
+        const details = [];
+        if (issues.missing.length) details.push(`Not yet in your plan: ${issues.missing.join(', ')}.`);
+        if (issues.later.length) details.push(`Planned for a later semester: ${issues.later.join(', ')}.`);
+        return `Taking this subject out of the recommended sequence requires LPAB approval. ${details.join(' ')}`;
     },
 
     /**

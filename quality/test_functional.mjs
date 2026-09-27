@@ -90,9 +90,11 @@ describe('REQ-002: Semester capacity limit', () => {
 });
 
 describe('REQ-004: Core-order advisory warning', () => {
+    const s = findSubject;
+
     test('core order — warns when prerequisite missing', () => {
         const plan = { winter2026: [] }; // nothing placed yet
-        const warning = Engine.checkCoreOrder('05', plan); // Real Property, 5th core subject
+        const warning = Engine.checkCoreOrder('05', 'winter2026', plan); // Real Property, 5th core subject
         assert.ok(warning);
         assert.ok(warning.includes('Foundations of Law'));
         assert.ok(warning.includes('Criminal Law & Procedure'));
@@ -101,20 +103,38 @@ describe('REQ-004: Core-order advisory warning', () => {
     });
 
     test('core order — no warning for first core subject', () => {
-        const plan = { winter2026: [] };
-        assert.equal(Engine.checkCoreOrder('01', plan), null);
+        assert.equal(Engine.checkCoreOrder('01', 'winter2026', { winter2026: [] }), null);
     });
 
     test('core order — no warning for non-core subject', () => {
-        const plan = { winter2026: [] };
-        assert.equal(Engine.checkCoreOrder('16', plan), null); // Insolvency, elective
+        assert.equal(Engine.checkCoreOrder('16', 'winter2026', { winter2026: [] }), null); // Insolvency, elective
     });
 
-    test('core order — no warning once all priors are present', () => {
-        const plan = {
-            completed: [findSubject('01'), findSubject('02'), findSubject('03'), findSubject('04')]
-        };
-        assert.equal(Engine.checkCoreOrder('05', plan), null);
+    test('core order — no warning once all priors are completed', () => {
+        const plan = { completed: [s('01'), s('02'), s('03'), s('04')] };
+        assert.equal(Engine.checkCoreOrder('05', 'winter2026', plan), null);
+    });
+
+    test('core order — a prerequisite in the same semester is in order (the LPAB pathway pairs them)', () => {
+        const plan = { summer2026: [s('01'), s('02')] };
+        assert.equal(Engine.checkCoreOrder('02', 'summer2026', plan), null);
+    });
+
+    test('core order — a prerequisite planned for a later semester is flagged', () => {
+        const plan = { summer2026: [s('03')], winter2028: [s('01'), s('02')] };
+        const issues = Engine.coreOrderIssues('03', 'summer2026', plan);
+        assert.deepEqual(issues, { missing: [], later: ['Foundations of Law', 'Criminal Law & Procedure'] });
+        assert.ok(Engine.checkCoreOrder('03', 'summer2026', plan).includes('Planned for a later semester'));
+    });
+
+    test('core order — missing and later prerequisites are reported separately', () => {
+        const plan = { winter2027: [s('02')], summer2026: [s('03')] };
+        assert.deepEqual(Engine.coreOrderIssues('03', 'summer2026', plan),
+            { missing: ['Foundations of Law'], later: ['Criminal Law & Procedure'] });
+    });
+
+    test('core order — marking a subject completed is never flagged', () => {
+        assert.equal(Engine.coreOrderIssues('05', 'completed', { completed: [] }), null);
     });
 });
 
@@ -436,7 +456,7 @@ describe('Boundary: getStatsForTerm', () => {
 
 describe('Boundary: checkCoreOrder with out-of-range subjectId', () => {
     test('checkCoreOrder — non-existent subject id treated as non-core (no throw)', () => {
-        assert.equal(Engine.checkCoreOrder('99', {}), null);
+        assert.equal(Engine.checkCoreOrder('99', 'winter2026', {}), null);
     });
 });
 

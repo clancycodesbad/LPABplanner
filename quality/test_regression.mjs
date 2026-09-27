@@ -95,6 +95,30 @@ describe('Saved plans pick up current subject data on load', () => {
         assert.equal(loaded.exam, live.exam, 'exam date comes from subjects.js, not the saved snapshot');
         assert.equal(loaded.lecture, live.lecture, 'lecture night comes from subjects.js, not the saved snapshot');
     });
+
+    test('semesters with an unrecognised ID are dropped on load, returning their subjects to the pool', async () => {
+        // A damaged saved plan: a misspelt semester ID and a semester that isn't a list.
+        const store = { lpab_planner_data: JSON.stringify({
+            completed: [],
+            summer2026: [findSubject('01')],
+            wintter2027: [findSubject('02')],
+            winter2028: 'not a list',
+        }) };
+        globalThis.localStorage = {
+            getItem: key => store[key] ?? null,
+            setItem: (key, value) => { store[key] = value; },
+            removeItem: key => { delete store[key]; },
+        };
+
+        const { PlannerState } = await import('../js/state/planner-state.js');
+        PlannerState.loadData();
+
+        assert.deepEqual(Object.keys(PlannerState.getPlan()).sort(), ['completed', 'summer2026']);
+        assert.equal(PlannerState.getProgress().totalSubjects, 1,
+            'Criminal Law (02) no longer counts towards progress while being invisible on the board');
+        assert.deepEqual(Object.keys(JSON.parse(store.lpab_planner_data)).sort(), ['completed', 'summer2026'],
+            'the cleaned plan is saved back to storage');
+    });
 });
 
 describe('BUG-002 (fixed): onboarding surfaces placement failures', () => {
