@@ -29,7 +29,6 @@ Because the app uses native ES6 `import`/`export`, it must be served over HTTP �
 - `js/data/suggested-pathway.js` — hardcoded LPAB-recommended sequence
 - `js/ui/*.js` — rendering, native + touch drag-and-drop, onboarding, toolbar
 - `data/stats/*.js` — per-term exam statistics (hand-maintained)
-- `html file version/` — a stale, explicitly out-of-scope snapshot; do not read or modify unless told to
 
 ## Easy to get wrong
 
