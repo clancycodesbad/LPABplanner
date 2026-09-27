@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html): MAJOR for changes that break saved plans or existing behaviour, MINOR for new features, PATCH for fixes and semester data updates.
 
+## [1.3.1] - 2026-09-27
+
+### Fixed
+
+- Markdown export showed the current term's exam date under every semester. Exam dates now appear only in the current term, and unparseable dates are left out.
+
 ## [1.3.0] - 2026-09-27
 
 ### Added
@@ -75,6 +81,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - **Subject pool disappearing after state refactor** — `ui-board.js` was accessing `PlannerState.plan` directly. After `_plan` became a private variable this returned `undefined`, causing the semester render loop to produce zero terms and the subject pool to never draw. Fixed by adding a `getPlan()` accessor to `PlannerState` and updating the one reference in `ui-board.js`. ([`d229d6f`](https://github.com/clancycodesbad/LPABplanner/commit/d229d6f1d30bb5eb6c2b91d74cae950076b86fca))
 
+[1.3.1]: https://github.com/clancycodesbad/LPABplanner/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/clancycodesbad/LPABplanner/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/clancycodesbad/LPABplanner/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/clancycodesbad/LPABplanner/compare/v1.1.0...v1.2.0
