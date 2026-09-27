@@ -11,26 +11,41 @@
 
 import { Engine } from '../../engine.js';
 import { currentTerm, subjects } from '../../subjects.js';
+import { isTermId } from '../utils/terms.js';
 import {
     loadPlan, savePlan, clearPlanOnly,
     loadHiddenSubjects, saveHiddenSubjects
 } from './storage.js';
 
 /**
- * Saved plans hold a snapshot of each subject from the day it was placed.
- * Swap each one for the live entry in subjects.js so exam dates, lecture
- * nights and names always reflect the current data, not a past term's.
- * A subject no longer in the catalogue keeps its saved copy.
+ * Load the saved plan, ready to use:
+ * - Semesters with an unrecognised ID, or that aren't a list, are dropped.
+ *   The board never shows them, so their subjects would otherwise be counted
+ *   towards progress but stuck out of sight; dropping them returns those
+ *   subjects to the pool. The cleaned plan is saved back.
+ * - Saved plans hold a snapshot of each subject from the day it was placed.
+ *   Each is swapped for its live entry in subjects.js so exam dates, lecture
+ *   nights and names reflect the current data. A subject no longer in the
+ *   catalogue keeps its saved copy.
  */
-function refreshSubjects(plan) {
+function loadCleanPlan() {
+    const plan = loadPlan();
+    let dropped = false;
     for (const semesterId of Object.keys(plan)) {
+        const validId = semesterId === 'completed' || isTermId(semesterId);
+        if (!validId || !Array.isArray(plan[semesterId])) {
+            delete plan[semesterId];
+            dropped = true;
+            continue;
+        }
         plan[semesterId] = plan[semesterId].map(saved =>
             subjects.find(s => s.id === saved.id) ?? saved);
     }
+    if (dropped) savePlan(plan);
     return plan;
 }
 
-let _plan = refreshSubjects(loadPlan());
+let _plan = loadCleanPlan();
 let _hidden = loadHiddenSubjects(); // string[] of subject IDs
 
 export const PlannerState = {
@@ -134,7 +149,7 @@ export const PlannerState = {
     // ── Persistence ───────────────────────────────────────────────────────────
 
     loadData() {
-        _plan   = refreshSubjects(loadPlan());
+        _plan   = loadCleanPlan();
         _hidden = loadHiddenSubjects();
     },
 
