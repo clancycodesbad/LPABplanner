@@ -1,7 +1,8 @@
 // ui-toolbar.js — export, print, and reset buttons
 import { PlannerState } from '../../planner.js';
 import { clearAll } from '../state/storage.js';
-import { isTermId, formatTermLabel, compareTerms } from '../utils/terms.js';
+import { currentTerm } from '../../subjects.js';
+import { formatPlanMarkdown } from '../services/plan-export.js';
 import { renderPlannerBoard } from './ui-board.js';
 import { renderSubjectPool } from './ui-pool.js';
 
@@ -14,23 +15,7 @@ export function setupExportButton() {
 }
 
 function handleExport() {
-    const plan = PlannerState.getPlan();
-    let text = '# LPAB Course Plan\n\n';
-
-    const completed = plan['completed'] || [];
-    if (completed.length) {
-        text += '## Completed\n';
-        completed.forEach(s => { text += `- ${s.id}: ${s.name}\n`; });
-        text += '\n';
-    }
-
-    Object.keys(plan).filter(isTermId).sort(compareTerms).forEach(term => {
-        text += `## ${formatTermLabel(term)}\n`;
-        (plan[term] || []).forEach(s => {
-            text += `- ${s.id}: ${s.name} (${s.lecture}${s.exam ? ', Exam: ' + s.exam : ''})\n`;
-        });
-        text += '\n';
-    });
+    const text = formatPlanMarkdown(PlannerState.getPlan(), currentTerm);
 
     navigator.clipboard.writeText(text)
         .then(() => showToast('Plan copied to clipboard!'))

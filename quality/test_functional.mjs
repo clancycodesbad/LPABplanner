@@ -32,6 +32,7 @@ import {
     getStatsForTerm
 } from '../js/services/stats-service.js';
 import { generateTermSequence, SUGGESTED_PATHWAY } from '../js/data/suggested-pathway.js';
+import { formatPlanMarkdown } from '../js/services/plan-export.js';
 
 // ─────────────────────────────────────────────────────────────────
 // Test fixtures — built from real subjects.js rows, per Step 4b.
@@ -439,13 +440,28 @@ describe('Boundary: checkCoreOrder with out-of-range subjectId', () => {
     });
 });
 
-describe('Export ordering (REQ-021 condition c)', () => {
-    test('export ordering — semester keys sort chronologically, matching the board', () => {
-        // ui-toolbar.js:handleExport sorts with compareTerms from js/utils/terms.js.
+describe('Markdown export (REQ-021)', () => {
+    const headings = text => text.split('\n').filter(l => l.startsWith('## ')).map(l => l.slice(3));
+
+    test('export ordering — semesters are listed chronologically, matching the board (condition c)', () => {
         const plan = { completed: [], summer2029: [], winter2030: [], winter2029: [] };
-        const sortedKeys = Object.keys(plan).filter(isTermId).sort(compareTerms);
-        assert.deepEqual(sortedKeys, ['winter2029', 'summer2029', 'winter2030'],
+        assert.deepEqual(headings(formatPlanMarkdown(plan, 'summer2026')),
+            ['Winter 2029', 'Summer 2029/30', 'Winter 2030'],
             'REQ-021(c): export order must match chronological order (see BUGS.md BUG-004, fixed)');
+    });
+
+    test('export — exam dates appear only in the current term, since they belong to it', () => {
+        const withExam = id => ({ ...findSubject(id), exam: '4 Mar 2027, 9.00 am' });
+        const plan = { completed: [], summer2026: [withExam('01')], winter2028: [withExam('02')] };
+        const lines = formatPlanMarkdown(plan, 'summer2026').split('\n');
+        const line = id => lines.find(l => l.startsWith(`- ${id}:`));
+        assert.ok(line('01').includes('Exam: 4 Mar 2027, 9.00 am'), 'current term shows its exam date');
+        assert.ok(!line('02').includes('Exam:'), 'a future term does not show the current term\'s date');
+    });
+
+    test('export — an unparseable exam date is left out rather than shown as valid', () => {
+        const plan = { completed: [], summer2026: [{ ...findSubject('01'), exam: '8 Sept 2026, 9.00 am' }] };
+        assert.ok(!formatPlanMarkdown(plan, 'summer2026').includes('Exam:'));
     });
 });
 

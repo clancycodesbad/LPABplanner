@@ -25,6 +25,7 @@ Because the app uses native ES6 `import`/`export`, it must be served over HTTP �
 - `js/utils/datetime.js` — exam-date parsing/formatting
 - `js/utils/terms.js` — term IDs: display labels, chronological ordering, term sequences
 - `js/services/stats-service.js` — historical exam-statistics derivation
+- `js/services/plan-export.js` — Markdown text for "Copy to Text" (pure, testable)
 - `js/data/suggested-pathway.js` — hardcoded LPAB-recommended sequence
 - `js/ui/*.js` — rendering, native + touch drag-and-drop, onboarding, toolbar
 - `data/stats/*.js` — per-term exam statistics (hand-maintained)

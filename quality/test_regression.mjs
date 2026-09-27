@@ -14,7 +14,8 @@ import assert from 'node:assert/strict';
 import { Engine, POSSIBLE_EXAM_CLASH } from '../engine.js';
 import { subjects } from '../subjects.js';
 import { parseExamDate } from '../js/utils/datetime.js';
-import { isTermId, compareTerms, termSequence } from '../js/utils/terms.js';
+import { formatTermLabel, termSequence } from '../js/utils/terms.js';
+import { formatPlanMarkdown } from '../js/services/plan-export.js';
 
 function findSubject(id) {
     const s = subjects.find(s => s.id === id);
@@ -137,10 +138,11 @@ describe('BUG-003 (fixed): malformed exam dates no longer display as valid', () 
 
 describe('BUG-004 (fixed): markdown export sorts semesters chronologically', () => {
     test('BUG-004: export ordering matches the board\'s term sequence, including within a year', () => {
-        // ui-toolbar.js:handleExport sorts with compareTerms; the board renders termSequence.
+        // The export (js/services/plan-export.js) against the board's sequence (termSequence).
         const plan = { completed: [], summer2030: [], winter2030: [], summer2029: [], winter2029: [] };
-        const exportOrder = Object.keys(plan).filter(isTermId).sort(compareTerms);
-        assert.deepEqual(exportOrder, termSequence('winter2029', 4),
+        const exported = formatPlanMarkdown(plan, 'summer2026')
+            .split('\n').filter(l => l.startsWith('## ')).map(l => l.slice(3));
+        assert.deepEqual(exported, termSequence('winter2029', 4).map(formatTermLabel),
             'BUG-004 [fixed]: winter2029 (May–Sep 2029) precedes summer2029 (Nov 2029–Mar 2030), ' +
             'which precedes winter2030, matching the board.');
     });
