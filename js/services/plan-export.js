@@ -1,5 +1,5 @@
 /**
- * plan-export.js — builds the Markdown text for the "Copy to Text" button.
+ * plan-export.js — builds the Markdown text for the "Copy plan" button.
  * Pure: no DOM or storage access, so it can be tested directly.
  */
 

@@ -2,9 +2,9 @@
 import { subjects, currentTerm } from '../../subjects.js';
 import { historicalExams } from '../../archive.js';
 import { parseExamDate } from '../utils/datetime.js';
-import { isTermId, formatTermLabel, compareTerms, termSequence } from '../utils/terms.js';
+import { isTermId, formatTermLabel, formatTermDates, compareTerms, termSequence } from '../utils/terms.js';
 import { PlannerState } from '../../planner.js';
-import { Engine, POSSIBLE_EXAM_CLASH } from '../../engine.js';
+import { Engine, POSSIBLE_EXAM_CLASH, MAX_SUBJECTS_PER_SEMESTER } from '../../engine.js';
 import { renderSubjectPool } from './ui-pool.js';
 import { renderProgress } from './ui-progress.js';
 import { feedbackPanel, errorListEl } from './ui-main.js';
@@ -22,9 +22,9 @@ export function getExamText(subject, semesterId) {
     if (semesterId === 'completed') return '';
 
     if (semesterId === currentTerm) {
-        if (!subject.exam) return '📝 Exam: TBA';
-        if (!parseExamDate(subject.exam)) return `⚠️ Exam date unrecognized: "${subject.exam}"`;
-        return `📝 Exam: ${subject.exam}`;
+        if (!subject.exam) return 'Exam TBA';
+        if (!parseExamDate(subject.exam)) return `Exam date unrecognized: "${subject.exam}"`;
+        return `Exam ${subject.exam}`;
     }
 
     let lastKnown = null;
@@ -40,7 +40,7 @@ export function getExamText(subject, semesterId) {
             }
         }
     }
-    return lastKnown ? `🕒 Last ran: ${lastKnown}` : '📝 Exam: TBA';
+    return lastKnown ? `Last ran ${lastKnown}` : 'Exam TBA';
 }
 
 export function handleAddSubject(subject, semesterId) {
@@ -94,7 +94,7 @@ export function renderPlannerBoard() {
 
     const completedSubjects = PlannerState.getSemester('completed');
     if (completedSubjects.length === 0) {
-        completedSection.innerHTML = `<div class="slots__empty">Drag completed subjects here</div>`;
+        completedSection.innerHTML = `<div class="slots__empty">Drag subjects you've finished here, or double-click them in the list.</div>`;
     } else {
         completedSubjects.forEach(subject => completedSection.appendChild(createSubjectSlot(subject, 'completed', null)));
     }
@@ -121,23 +121,31 @@ export function renderPlannerBoard() {
         const plannedSubjects = PlannerState.getSemester(semesterId);
         const clashData = PlannerState.getClashes(semesterId);
 
+        const isCurrent = semesterId === currentTerm;
         const card = document.createElement('section');
-        card.className = 'semester-card';
-        const titleName = formatTermLabel(semesterId);
-
-        card.innerHTML = `<h2>${titleName}</h2><div class="semester-slots" data-semester-id="${semesterId}"></div>`;
+        card.className = `semester-card${isCurrent ? ' semester-card--current' : ''}`;
+        card.innerHTML = `
+            <div class="semester-card__label">
+                <h2 class="semester-card__title">${formatTermLabel(semesterId)}</h2>
+                <p class="semester-card__dates">${formatTermDates(semesterId)}</p>
+                ${isCurrent ? '<p class="semester-card__now">Now</p>' : ''}
+            </div>
+            <div class="semester-slots" data-semester-id="${semesterId}"></div>`;
         const slotsContainer = card.querySelector('.semester-slots');
 
         slotsContainer.ondragover  = (e) => { e.preventDefault(); e.currentTarget.classList.add('drag-over'); };
         slotsContainer.ondragleave = (e) => { e.currentTarget.classList.remove('drag-over'); };
         slotsContainer.ondrop      = (e) => { e.currentTarget.classList.remove('drag-over'); handleDrop(e, semesterId); };
 
-        if (plannedSubjects.length === 0) {
-            slotsContainer.innerHTML = `<div class="slots__empty">Drag subjects here (Max 4)</div>`;
-        } else {
-            plannedSubjects.forEach(subject => {
-                slotsContainer.appendChild(createSubjectSlot(subject, semesterId, clashData[subject.id]));
-            });
+        plannedSubjects.forEach(subject => {
+            slotsContainer.appendChild(createSubjectSlot(subject, semesterId, clashData[subject.id]));
+        });
+        // Empty slots show how many of the semester's four places are left.
+        for (let i = plannedSubjects.length; i < MAX_SUBJECTS_PER_SEMESTER; i++) {
+            const empty = document.createElement('div');
+            empty.className = 'slot-empty';
+            if (plannedSubjects.length === 0 && i === 0) empty.textContent = 'Drag a subject here';
+            slotsContainer.appendChild(empty);
         }
 
         dynamicContainer.appendChild(card);
@@ -154,15 +162,15 @@ function createSubjectSlot(subject, semesterId, subjectWarnings) {
     const hardClashes = warnings.filter(w => w !== POSSIBLE_EXAM_CLASH);
     const possibleClashes = warnings.filter(w => w === POSSIBLE_EXAM_CLASH);
     const orderIssues = Engine.coreOrderIssues(subject.id, semesterId, PlannerState.getPlan());
-    const sType = subject.type.toLowerCase();
-    const groupClass = subject.group === 'core' ? 'slot--core' :
-                       sType === 'compulsory'    ? 'slot--compulsory' :
-                                                   'slot--elective';
-    const stateClass = hardClashes.length > 0 ? 'slot--clash' :
-                       possibleClashes.length > 0 || orderIssues ? 'slot--warning' :
-                                                    groupClass;
+    const isCompleted = semesterId === 'completed';
+    // The type stripe always shows; a warning adds its own colour on top.
+    const typeClass = subject.group === 'core' ? 'slot--core' :
+                      subject.type.toLowerCase() === 'compulsory' ? 'slot--compulsory' :
+                                                                    'slot--elective';
+    const stateClass = hardClashes.length > 0 ? ' slot--clash' :
+                       possibleClashes.length > 0 || orderIssues ? ' slot--warning' : '';
 
-    slot.className = `slot ${stateClass}`;
+    slot.className = `slot ${typeClass}${stateClass}${isCompleted ? ' slot--completed' : ''}`;
     slot.draggable = true;
     // Data attributes for touch DnD
     slot.dataset.subjectId = subject.id;
@@ -175,48 +183,43 @@ function createSubjectSlot(subject, semesterId, subjectWarnings) {
 
     // Stage 2: only attach dblclick on non-touch devices to avoid triggering
     // the browser's double-tap-to-zoom gesture on mobile.
-    if (semesterId !== 'completed' && !isTouchPrimary) {
-        slot.title = 'Double-Click to mark as Completed';
+    if (!isCompleted && !isTouchPrimary) {
+        slot.title = 'Double-click to mark as completed';
         slot.ondblclick = () => window.markCompleted(semesterId, subject.id);
-    }
-
-    const completeBtnHtml = semesterId !== 'completed'
-        ? `<button class="action-btn slot__btn--done" onclick="markCompleted('${semesterId}', '${subject.id}')">✓ Done</button>`
-        : '';
-    const lectureDisplay = semesterId !== 'completed'
-        ? `<div class="slot__lecture">📅 ${subject.lecture}</div>` : '';
-    const examDisplay = semesterId !== 'completed'
-        ? `<div class="slot__exam">${getExamText(subject, semesterId)}</div>` : '';
-
-    // Icons are decorative: the text already says what each warning is.
-    const icon = emoji => `<span aria-hidden="true">${emoji}</span>`;
-    let clashWarningHtml = '';
-    hardClashes.forEach(w => { clashWarningHtml += `<div class="slot__clash-warning">${icon('⚠️')} ${w}</div>`; });
-    possibleClashes.forEach(w => { clashWarningHtml += `<div class="slot__warning-msg">${icon('⏳')} ${w}</div>`; });
-    if (orderIssues) {
-        const takeFirst = [...orderIssues.missing, ...orderIssues.later].join(', ');
-        clashWarningHtml += `<div class="slot__warning-msg">${icon('⚠️')} Out of sequence — needs LPAB approval. Take first: ${takeFirst}.</div>`;
     }
 
     const groupLabel = subject.group === 'core' ? 'Core' :
                        subject.group === 'compulsory' ? 'Compulsory' : 'Elective';
 
+    // Icons are decorative: the text already says what each warning is.
+    const icon = emoji => `<span aria-hidden="true">${emoji}</span>`;
+    let warningsHtml = '';
+    hardClashes.forEach(w => { warningsHtml += `<p class="slot__clash-warning">${icon('⚠️')} ${w}</p>`; });
+    possibleClashes.forEach(w => { warningsHtml += `<p class="slot__warning-msg">${icon('⏳')} ${w}</p>`; });
+    if (orderIssues) {
+        const takeFirst = [...orderIssues.missing, ...orderIssues.later].join(', ');
+        warningsHtml += `<p class="slot__warning-msg">${icon('⚠️')} Out of sequence — needs LPAB approval. Take first: ${takeFirst}.</p>`;
+    }
+
+    const detailsHtml = isCompleted ? '' : `
+        <p class="slot__lecture">${subject.lecture} lectures</p>
+        <p class="slot__exam">${getExamText(subject, semesterId)}</p>`;
+    const doneBtnHtml = isCompleted ? '' :
+        `<button class="action-btn slot__btn--done" aria-label="Done — move ${subject.name} to Completed" onclick="markCompleted('${semesterId}', '${subject.id}')">Done</button>`;
+
     slot.innerHTML = `
-        <div style="text-align:center;width:100%;">
-            <strong>${subject.name}</strong><br>
-            <span class="slot__type">${groupLabel}</span>
-            ${lectureDisplay}${examDisplay}${clashWarningHtml}
-            <div class="slot__actions">
-                ${completeBtnHtml}
-                <button class="action-btn slot__btn--remove" onclick="removeSubject('${semesterId}', '${subject.id}')">✕ Remove</button>
-            </div>
+        <p class="slot__name">${subject.name}</p>
+        <p class="slot__type">${groupLabel}</p>
+        ${detailsHtml}${warningsHtml}
+        <div class="slot__actions">
+            ${doneBtnHtml}
+            <button class="action-btn slot__btn--remove" aria-label="Remove ${subject.name}" onclick="removeSubject('${semesterId}', '${subject.id}')">Remove</button>
         </div>
     `;
 
-    // Append grade bar below the inner content (only for non-completed slots)
-    if (semesterId !== 'completed') {
+    if (!isCompleted) {
         const gradeBar = createGradeBar(subject.id);
-        if (gradeBar) slot.querySelector('div').appendChild(gradeBar);
+        if (gradeBar) slot.appendChild(gradeBar);
     }
 
     return slot;

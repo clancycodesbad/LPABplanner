@@ -32,6 +32,15 @@ export function formatTermLabel(termId) {
     return `Summer ${year}/${String(year + 1).slice(-2)}`;
 }
 
+/**
+ * When the term runs, lectures to exams: 'winter2026' → 'May–Sep 2026',
+ * 'summer2026' → 'Nov 2026 – Mar 2027'.
+ */
+export function formatTermDates(termId) {
+    const { season, year } = parseTerm(termId);
+    return season === 'winter' ? `May–Sep ${year}` : `Nov ${year} – Mar ${year + 1}`;
+}
+
 /** Sort comparator: chronological order (winter2026 < summer2026 < winter2027). */
 export function compareTerms(a, b) {
     const rank = termId => {

@@ -17,7 +17,7 @@ import assert from 'node:assert/strict';
 
 import { Engine, POSSIBLE_EXAM_CLASH } from '../engine.js';
 import { subjects, currentTerm, computeCurrentTerm } from '../subjects.js';
-import { isTermId, formatTermLabel, compareTerms, termSequence } from '../js/utils/terms.js';
+import { isTermId, formatTermLabel, formatTermDates, compareTerms, termSequence } from '../js/utils/terms.js';
 import { historicalExams } from '../archive.js';
 import {
     parseExamDate,
@@ -496,6 +496,11 @@ describe('Plan term IDs (js/utils/terms.js)', () => {
         assert.equal(formatTermLabel('winter2026'), 'Winter 2026');
         assert.equal(formatTermLabel('summer2026'), 'Summer 2026/27');
         assert.equal(formatTermLabel('summer2099'), 'Summer 2099/00');
+    });
+
+    test('formatTermDates — winter runs May to September, summer runs November to March', () => {
+        assert.equal(formatTermDates('winter2027'), 'May–Sep 2027');
+        assert.equal(formatTermDates('summer2026'), 'Nov 2026 – Mar 2027');
     });
 
     test('termSequence — continues across the summer-to-winter year boundary', () => {

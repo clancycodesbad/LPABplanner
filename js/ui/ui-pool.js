@@ -20,9 +20,24 @@ export function renderSubjectPool() {
     const visible  = subjects.filter(s => !planned.includes(s.id) && !hiddenIds.includes(s.id));
     const hidden   = subjects.filter(s => !planned.includes(s.id) &&  hiddenIds.includes(s.id));
 
-    if (visible.length === 0 && hidden.length === 0) return;
+    if (visible.length === 0 && hidden.length === 0) {
+        subjectListEl.innerHTML = '<p class="pool-empty">Every subject is in your plan.</p>';
+        return;
+    }
 
-    visible.forEach(subject => subjectListEl.appendChild(createPoolItem(subject)));
+    // subjects.js lists core, then compulsory, then electives.
+    const groupHeadings = { core: 'Core, in order', compulsory: 'Compulsory', elective: 'Electives, choose 3' };
+    let lastGroup = null;
+    visible.forEach(subject => {
+        if (subject.group !== lastGroup) {
+            const heading = document.createElement('h3');
+            heading.className = 'pool-group';
+            heading.textContent = groupHeadings[subject.group];
+            subjectListEl.appendChild(heading);
+            lastGroup = subject.group;
+        }
+        subjectListEl.appendChild(createPoolItem(subject));
+    });
 
     // Hidden subjects collapsible
     if (hidden.length > 0) {
@@ -70,20 +85,18 @@ function createPoolItem(subject, isHidden = false) {
         // Stage 2: only attach dblclick on non-touch devices to avoid triggering
         // the browser's double-tap-to-zoom gesture on mobile.
         if (!isTouchPrimary) {
-            div.title    = 'Drag to a semester, or Double-Click to mark as Completed';
+            div.title    = 'Drag to a semester, or double-click to mark as completed';
             div.ondblclick = () => handleAddSubject(subject, 'completed');
         }
     }
 
-    const groupLabel = subject.group === 'core' ? 'Core' :
-                       subject.group === 'compulsory' ? 'Compulsory' : 'Elective';
-
-    // Header row: name left, difficulty badge right
+    // Header row: number and name left, fail-rate badge right
     const header = document.createElement('div');
     header.className = 'subject-item__header';
 
-    const nameEl = document.createElement('strong');
-    nameEl.textContent = `${subject.id}: ${subject.name}`;
+    const nameEl = document.createElement('p');
+    nameEl.className = 'subject-item__name';
+    nameEl.innerHTML = `<span class="subject-item__id">${subject.id}</span> ${subject.name}`;
     header.appendChild(nameEl);
 
     const badge = createDifficultyBadge(subject.id);
@@ -91,9 +104,11 @@ function createPoolItem(subject, isHidden = false) {
 
     div.appendChild(header);
 
-    const meta = document.createElement('div');
+    // Most subjects run in both terms, so only a single-term subject says which.
+    const meta = document.createElement('p');
     meta.className = 'subject-meta';
-    meta.textContent = `${groupLabel} | ${subject.terms.join(', ')} · ${subject.lecture}`;
+    const onlyTerm = subject.terms.length === 1 ? `, ${subject.terms[0].toLowerCase()} only` : '';
+    meta.textContent = `${subject.lecture} lectures${onlyTerm}`;
     div.appendChild(meta);
 
     return div;
