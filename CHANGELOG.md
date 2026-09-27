@@ -2,6 +2,31 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html): MAJOR for changes that break saved plans or existing behaviour, MINOR for new features, PATCH for fixes and semester data updates.
 
+## [1.5.0] - 2026-09-27
+
+### Added
+
+- Each term shows when it runs, from lectures to exams (for example "Nov 2026 – Mar 2027"), and the current term is tagged "Now".
+- The subject list is grouped into core, compulsory and electives, and names a subject's term only when it runs in one term ("winter only").
+- The progress status says what's left to place, for example "6 compulsory subjects and 2 electives still to place".
+
+### Changed
+
+- New design. Each term is a timetable row with four slots, so a semester's remaining space is visible. A pink ribbon runs down the edge of the plan. Headings use Libre Caslon Text and body text Atkinson Hyperlegible Next, both served from the site.
+- Red and amber now only mean a clash or warning. Subject type is shown by a coloured stripe and the word, so a core subject no longer looks like a warning.
+- One primary button (Copy plan); Reset plan is the quietest. Buttons renamed to Copy plan, Help, Print and Reset plan.
+- Completed subjects are shown as a compact list.
+- Tile buttons name the subject for screen readers ("Remove Real Property"), and keyboard focus is clearly visible.
+- All text meets WCAG AA contrast in both themes, including the fainter text, which previously didn't.
+
+### Fixed
+
+- On touch screens, dragging a subject into a summer semester saved it under an invalid semester, so it vanished from the board. Drop areas now carry their semester ID instead of it being read from the heading text.
+- On phones, the Help button and the help tour's Back button were hidden along with Print.
+- Out-of-sequence warnings in the feedback panel had no styling.
+- The dark theme's fallback for browsers without JavaScript never applied, because of an invalid CSS rule.
+- The help tour described a subject filter that doesn't exist.
+
 ## [1.4.2] - 2026-09-27
 
 ### Removed
@@ -110,6 +135,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - **Subject pool disappearing after state refactor** — `ui-board.js` was accessing `PlannerState.plan` directly. After `_plan` became a private variable this returned `undefined`, causing the semester render loop to produce zero terms and the subject pool to never draw. Fixed by adding a `getPlan()` accessor to `PlannerState` and updating the one reference in `ui-board.js`. ([`d229d6f`](https://github.com/clancycodesbad/LPABplanner/commit/d229d6f1d30bb5eb6c2b91d74cae950076b86fca))
 
+[1.5.0]: https://github.com/clancycodesbad/LPABplanner/compare/v1.4.2...v1.5.0
 [1.4.2]: https://github.com/clancycodesbad/LPABplanner/compare/v1.4.1...v1.4.2
 [1.4.1]: https://github.com/clancycodesbad/LPABplanner/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/clancycodesbad/LPABplanner/compare/v1.3.1...v1.4.0

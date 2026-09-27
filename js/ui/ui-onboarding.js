@@ -9,7 +9,7 @@
  *     — Writes lpab_onboarding_done to localStorage via markOnboardingDone().
  *
  *   showOnboarding()
- *     — Tile-based help tour. Triggered by the Help / Tour button.
+ *     — Tile-based help tour. Triggered by the Help button.
  *     — Can be shown any number of times. No onComplete needed.
  *     — Uses the existing #onboarding-overlay HTML structure.
  *
@@ -393,7 +393,7 @@ const STEPS = [
     {
         title: 'How to build your plan',
         tiles: [
-            { heading: 'Browse the subject pool', body: 'All available subjects are listed in the left-hand panel. Use the filter to narrow by semester, type, or lecture night.' },
+            { heading: 'Browse the subjects',     body: 'Every subject not yet in your plan is listed in the Subjects panel, grouped into core, compulsory and electives, with its lecture night and recent fail rate.' },
             { heading: 'Drag into a semester',    body: 'Drag any subject from the pool into the semester card where you intend to take it. Each semester holds a maximum of four subjects, and some subjects run in winter or summer only.' },
             { heading: 'Mark subjects complete',  body: 'Once you have finished a subject, double-click its tile or press the Done button to move it to the Completed section.' },
         ]

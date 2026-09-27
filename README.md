@@ -10,7 +10,7 @@ unashamedly vibe coded, because i sure as hell couldnt do it otherwise.
 
 ## Features
 
-- **Drag-and-drop interface** — Move subjects from the pool into semesters or the Already Completed section
+- **Drag-and-drop interface** — Move subjects from the subject list into semesters or the Completed section
 - **Graduation tracker** — Real-time progress bars for compulsory subjects and electives
 - **Clash detection** — Warns when two subjects in the same semester share a lecture night. In the current semester, once its exam timetable is published, warns when two subjects share an exam time. In any other semester, flags a possible exam clash when the pair has shared an exam slot in a published timetable before
 - **Historical exam archive** — Subjects placed in future semesters show their last known exam date from `archive.js`, and past timetables in `archive.js` drive the possible-clash warnings
@@ -56,6 +56,7 @@ LPABplanner/
 ├── planner.js                  ← Re-export shim (backwards compatibility)
 ├── css/
 │   └── planner.css             ← All styles and CSS tokens (light + dark mode)
+├── fonts/                      ← Self-hosted typefaces and their licences (SIL OFL)
 └── js/
     ├── state/
     │   ├── planner-state.js    ← In-memory plan state and mutations

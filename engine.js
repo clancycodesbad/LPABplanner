@@ -3,6 +3,8 @@ import { subjects as allSubjects } from './subjects.js';
 import { historicalExams } from './archive.js';
 import { isTermId, compareTerms } from './js/utils/terms.js';
 
+export const MAX_SUBJECTS_PER_SEMESTER = 4;
+
 // IDs of the 11 core subjects, in required sequence.
 const CORE_ORDER = ['01','02','03','04','05','06','07','08','09','10','11'];
 
@@ -25,7 +27,7 @@ export const Engine = {
             errors.push(`${newSubject.name} is not offered in ${termName}.`);
         }
 
-        if (selectedList.length >= 4) {
+        if (selectedList.length >= MAX_SUBJECTS_PER_SEMESTER) {
             errors.push('Maximum of 4 subjects per semester exceeded.');
         }
 

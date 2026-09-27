@@ -20,12 +20,13 @@ Because the app uses native ES6 `import`/`export`, it must be served over HTTP �
 - `archive.js` — historical exam dates by semester; also drives possible-clash warnings
 - `engine.js` — validation and clash-detection logic
 - `planner.js` — re-export shim only; never add logic here
-- `css/planner.css` — all styles, light/dark tokens
+- `css/planner.css` — all styles, light/dark tokens; the design intent is summarised at the top of the file
+- `fonts/` — self-hosted Libre Caslon Text and Atkinson Hyperlegible Next, with their SIL OFL licences
 - `js/state/` — `planner-state.js` (in-memory plan + mutations), `storage.js` (localStorage boundary)
 - `js/utils/datetime.js` — exam-date parsing/formatting
 - `js/utils/terms.js` — term IDs: display labels, chronological ordering, term sequences
 - `js/services/stats-service.js` — historical exam-statistics derivation
-- `js/services/plan-export.js` — Markdown text for "Copy to Text" (pure, testable)
+- `js/services/plan-export.js` — Markdown text for "Copy plan" (pure, testable)
 - `js/data/suggested-pathway.js` — hardcoded LPAB-recommended sequence
 - `js/ui/*.js` — rendering, native + touch drag-and-drop, onboarding, toolbar
 - `data/stats/*.js` — per-term exam statistics (hand-maintained)
@@ -38,6 +39,8 @@ Because the app uses native ES6 `import`/`export`, it must be served over HTTP �
 - **`subjects.js`/`archive.js` are updated by hand twice a year** from the published LPAB PDFs (see README's "Updating for a New Semester"). Exam-date strings must match `'D Mon YYYY, H.MM am/pm'` exactly — `js/utils/datetime.js`'s parser is strict and any format drift must be paired with a parser update.
 - **Exam dates in `subjects.js` belong to the current term only.** A matching exam time is a confirmed clash only in `currentTerm` once its timetable is published. Everywhere else, a pair that has shared an exam slot in a published timetable is flagged as a possible clash (`POSSIBLE_EXAM_CLASH` in `engine.js`). Never compare exam dates across terms: LPAB assigns slots deliberately per term.
 - **Saved plans store a copy of each subject.** `planner-state.js` swaps each one for the live `subjects.js` entry on load, so data changes reach existing plans. Don't read subject details from the saved plan without going through that.
+- **Drop areas carry `data-semester-id`**, which touch drag-and-drop reads. Never derive a semester ID from heading text — the labels are for display ("Summer 2026/27").
+- **Red and amber mean status only** (clash, warning). Subject type is shown by the tile's stripe and its label, never by red or amber. Check any new colour pairing against WCAG AA in both themes.
 - **`planner.js` is a re-export shim** — it only re-exports `PlannerState` from `js/state/planner-state.js`. Never add logic to it.
 
 ## Quality Docs
