@@ -69,7 +69,8 @@ LPABplanner/
     │   ├── ui-progress.js      ← Progress tracker and graduation status
     │   └── ui-toolbar.js       ← Export and print buttons
     └── utils/
-        └── datetime.js         ← Exam date parsing and comparison
+        ├── datetime.js         ← Exam date parsing and comparison
+        └── terms.js            ← Term IDs: labels, ordering, sequences
 ```
 
 ### Module responsibilities
@@ -82,6 +83,7 @@ LPABplanner/
 | `js/state/storage.js` | localStorage only | Nothing |
 | `js/state/planner-state.js` | Plan mutations | `engine.js`, `storage.js`, `subjects.js` |
 | `js/utils/datetime.js` | Date parsing + comparison | Nothing |
+| `js/utils/terms.js` | Term ID labels, ordering, sequences | Nothing |
 | `js/ui/ui-board.js` | Board rendering, drag-and-drop | `planner-state.js`, other UI modules |
 | `js/ui/ui-pool.js` | Subject pool rendering | `planner-state.js`, `ui-board.js` |
 | `js/ui/ui-progress.js` | Progress bars | `planner-state.js` |
@@ -94,6 +96,8 @@ LPABplanner/
 ## Updating for a New Semester
 
 When the LPAB releases a new Evening Lecture Schedule and Examination Timetable, only two files need to change: `subjects.js` and `archive.js`. No logic or UI code needs to be touched.
+
+Term IDs name the year a term starts: `winter2026` is May to September 2026, and `summer2026` is November 2026 to March 2027, shown on the site as "Summer 2026/27". (Exam statistics in `data/stats/` are keyed differently, by exam sitting — see `data/stats/index.js`.)
 
 ### Step 1 — Archive the outgoing semester
 
@@ -134,6 +138,23 @@ In `subjects.js`, update each subject's `lecture` and `exam` fields from the new
 - The `terms` array (`['Winter']`, `['Summer']`, or `['Winter', 'Summer']`) controls which semesters a subject can be added to. Update this if LPAB changes availability.
 - Exam date format must be `'D Mon YYYY, H.MM am/pm'` (e.g., `'3 Mar 2027, 9.00 am'`). This is what `datetime.js` parses — any other format shows as "Exam date unrecognized" on the board and is left out of clash detection.
 - Until the new exam timetable is published, leave every `exam` as `null`. The board shows "Last ran" dates from `archive.js`, and possible clashes are flagged from past timetables.
+
+---
+
+## Releasing a New Version
+
+The project uses [Semantic Versioning](https://semver.org): bump **MAJOR** for changes that break saved plans or existing behaviour, **MINOR** for new features, and **PATCH** for fixes and semester data updates. Every deploy is a release:
+
+1. Add a section to `CHANGELOG.md` for the new version, following [Keep a Changelog](https://keepachangelog.com), and a compare link at the bottom.
+2. Update the version and date in the footer of `index.html` (`v1.3.0 · Last updated ...`, including the `<time datetime>` value).
+3. Commit, then tag the commit and push both:
+
+   ```bash
+   git tag -a v1.3.1 -m "v1.3.1"
+   git push origin testing --follow-tags
+   ```
+
+4. Deploy (see `AGENTS.md`).
 
 ---
 

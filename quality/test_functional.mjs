@@ -16,7 +16,8 @@ import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 
 import { Engine, POSSIBLE_EXAM_CLASH } from '../engine.js';
-import { subjects, currentTerm } from '../subjects.js';
+import { subjects, currentTerm, computeCurrentTerm } from '../subjects.js';
+import { isTermId, formatTermLabel, compareTerms, termSequence } from '../js/utils/terms.js';
 import { historicalExams } from '../archive.js';
 import {
     parseExamDate,
@@ -440,17 +441,50 @@ describe('Boundary: checkCoreOrder with out-of-range subjectId', () => {
 
 describe('Export ordering (REQ-021 condition c)', () => {
     test('export ordering — semester keys sort chronologically, matching the board', () => {
-        // Mirrors ui-toolbar.js:compareTermsChronologically directly,
-        // without depending on the DOM-bound handleExport function.
-        function compareTermsChronologically(a, b) {
-            const yearOf = term => parseInt(term.match(/\d{4}/)[0], 10);
-            const rankOf = term => (term.startsWith('summer') ? 0 : 1);
-            return (yearOf(a) * 10 + rankOf(a)) - (yearOf(b) * 10 + rankOf(b));
-        }
-        const plan = { completed: [], winter2029: [], summer2030: [] };
-        const sortedKeys = Object.keys(plan).filter(k => k !== 'completed').sort(compareTermsChronologically);
-        // Chronologically, winter2029 precedes summer2030 (Sep 2029 exam before Mar 2030 exam).
-        assert.deepEqual(sortedKeys, ['winter2029', 'summer2030'],
+        // ui-toolbar.js:handleExport sorts with compareTerms from js/utils/terms.js.
+        const plan = { completed: [], summer2029: [], winter2030: [], winter2029: [] };
+        const sortedKeys = Object.keys(plan).filter(isTermId).sort(compareTerms);
+        assert.deepEqual(sortedKeys, ['winter2029', 'summer2029', 'winter2030'],
             'REQ-021(c): export order must match chronological order (see BUGS.md BUG-004, fixed)');
     });
+});
+
+describe('Plan term IDs (js/utils/terms.js)', () => {
+    test('formatTermLabel — winter shows one year, summer shows both years', () => {
+        assert.equal(formatTermLabel('winter2026'), 'Winter 2026');
+        assert.equal(formatTermLabel('summer2026'), 'Summer 2026/27');
+        assert.equal(formatTermLabel('summer2099'), 'Summer 2099/00');
+    });
+
+    test('termSequence — continues across the summer-to-winter year boundary', () => {
+        assert.deepEqual(termSequence('summer2026', 3), ['summer2026', 'winter2027', 'summer2027']);
+    });
+
+    test('compareTerms — orders winter before summer in the same year', () => {
+        assert.ok(compareTerms('winter2026', 'summer2026') < 0);
+        assert.ok(compareTerms('summer2026', 'winter2027') < 0);
+    });
+
+    test('isTermId — rejects anything that is not a plan term ID', () => {
+        assert.equal(isTermId('summer2026'), true);
+        assert.equal(isTermId('completed'), false);
+        assert.equal(isTermId('wintter2027'), false);
+    });
+});
+
+describe('computeCurrentTerm — flips on 15 March and 15 September', () => {
+    const cases = [
+        [new Date(2026, 8, 14), 'winter2026', 'the day before the September cutoff'],
+        [new Date(2026, 8, 15), 'summer2026', 'the September cutoff: the term starting in November'],
+        [new Date(2026, 8, 27), 'summer2026', 'late September 2026'],
+        [new Date(2026, 11, 31), 'summer2026', 'end of year'],
+        [new Date(2027, 0, 1), 'summer2026', 'new year: still the term that started last November'],
+        [new Date(2027, 2, 14), 'summer2026', 'the day before the March cutoff'],
+        [new Date(2027, 2, 15), 'winter2027', 'the March cutoff'],
+    ];
+    for (const [date, expected, why] of cases) {
+        test(`${date.toDateString()} → ${expected} (${why})`, () => {
+            assert.equal(computeCurrentTerm(date), expected);
+        });
+    }
 });

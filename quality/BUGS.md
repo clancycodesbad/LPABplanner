@@ -93,4 +93,6 @@ Full 3-of-3 council completed 2026-09-27: in-house auditor (Claude Sonnet 5, sam
 
 ## Fix pass (2026-09-27)
 
+**Corrections found during browser verification (2026-09-27):** (1) the saved-plan refresh ran when the module loaded but not in `PlannerState.loadData()`, which is what `ui-main.js` calls on startup, so it had no effect in the app — `loadData()` now refreshes too, and its test goes through `loadData()`. (2) The BUG-004 fix ordered Summer before Winter within a year, and `computeCurrentTerm()` returned `summer2027` instead of `summer2026`: both assumed `summerYYYY` meant the March YYYY exam sitting, but plan term IDs name the year the term starts. Term labels, ordering and sequences now live in `js/utils/terms.js`, and the tests import it instead of copying the logic.
+
 All five bugs were fixed in the working tree following council reconciliation. BUG-002 to BUG-005 were fixed directly. BUG-001 was fixed after the maintainer settled how clashes should work across terms (see its entry). `quality/test_regression.mjs` and the affected tests in `quality/test_functional.mjs` assert the corrected behavior and will fail if a future change reintroduces any of these defects. Full suite: 58/58 passing (`node --test quality/test_functional.mjs quality/test_regression.mjs`).

@@ -10,6 +10,7 @@ Because the app uses native ES6 `import`/`export`, it must be served over HTTP �
 - `/opt/lpabplanner` is a git clone of this repo on the `testing` branch, bind-mounted read-only as the web root.
 - Because the whole clone is the web root, `/opt/lpabplanner/.nginx.conf` (mounted as the container's `default.conf`) returns 404 for dot-files (including `.git/`), `docker-compose.yml`, `quality/` and all `.md` files. Keep this in place, and add any new internal folder to it.
 - To deploy: push to `testing`, then on plex2 run `cd /opt/lpabplanner && sudo git pull && sudo docker restart lpabplanner`.
+- Every deploy is a Semantic Versioning release: bump the version and date in `index.html`'s footer, add a `CHANGELOG.md` entry and tag the commit `vX.Y.Z` (see README "Releasing a New Version").
 - The GitHub repo (`clancycodesbad/LPABplanner`) is public on purpose — an exception to the private-by-default rule.
 
 ## Structure
@@ -22,6 +23,7 @@ Because the app uses native ES6 `import`/`export`, it must be served over HTTP �
 - `css/planner.css` — all styles, light/dark tokens
 - `js/state/` — `planner-state.js` (in-memory plan + mutations), `storage.js` (localStorage boundary)
 - `js/utils/datetime.js` — exam-date parsing/formatting
+- `js/utils/terms.js` — term IDs: display labels, chronological ordering, term sequences
 - `js/services/stats-service.js` — historical exam-statistics derivation
 - `js/data/suggested-pathway.js` — hardcoded LPAB-recommended sequence
 - `js/ui/*.js` — rendering, native + touch drag-and-drop, onboarding, toolbar
@@ -29,6 +31,8 @@ Because the app uses native ES6 `import`/`export`, it must be served over HTTP �
 - `html file version/` — a stale, explicitly out-of-scope snapshot; do not read or modify unless told to
 
 ## Easy to get wrong
+
+- **Term IDs name the year a term starts.** `summer2026` is the term from November 2026 to March 2027, and terms run `winter2026` → `summer2026` → `winter2027`. It's shown as "Summer 2026/27" everywhere; winter terms show one year. Use `js/utils/terms.js` for labels, ordering and sequences — never format or sort term IDs by hand. `data/stats/` keys follow a different rule (`summer2026` there is the March 2026 exam sitting); never mix the two.
 
 - **Two drag-and-drop implementations** exist: native HTML5 DnD in `ui-board.js` (mouse) and a custom pointer-event implementation in `ui-touch-dnd.js` (touch). Both move subjects through the shared `attemptMove()` in `ui-board.js`, which validates the target before removing from the source. Keep move logic there, not in either handler.
 - **`subjects.js`/`archive.js` are updated by hand twice a year** from the published LPAB PDFs (see README's "Updating for a New Semester"). Exam-date strings must match `'D Mon YYYY, H.MM am/pm'` exactly — `js/utils/datetime.js`'s parser is strict and any format drift must be paired with a parser update.

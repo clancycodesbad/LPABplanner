@@ -14,6 +14,7 @@ import assert from 'node:assert/strict';
 import { Engine, POSSIBLE_EXAM_CLASH } from '../engine.js';
 import { subjects } from '../subjects.js';
 import { parseExamDate } from '../js/utils/datetime.js';
+import { isTermId, compareTerms, termSequence } from '../js/utils/terms.js';
 
 function findSubject(id) {
     const s = subjects.find(s => s.id === id);
@@ -31,7 +32,7 @@ describe('BUG-001 (fixed): exam-clash warnings beyond the current term', () => {
         (clashes[id] || []).filter(w => w.startsWith('Exam clash') || w === POSSIBLE_EXAM_CLASH);
 
     test('BUG-001: a pair that clashed in an archived term is flagged as a possible clash in a future term', () => {
-        const clashes = Engine.getClashingSubjects([contracts(), insolvency()], 'winter2029', 'summer2027');
+        const clashes = Engine.getClashingSubjects([contracts(), insolvency()], 'winter2029', 'summer2026');
         assert.deepEqual(examWarnings(clashes, '04'), [POSSIBLE_EXAM_CLASH],
             'a future term has no published timetable, so a historical clash is an advisory, not a confirmed clash');
     });
@@ -39,46 +40,47 @@ describe('BUG-001 (fixed): exam-clash warnings beyond the current term', () => {
     test('BUG-001: a pair that never shared an exam slot gets no exam warning in a future term', () => {
         const s1 = { ...findSubject('01'), lecture: 'L1' };
         const s2 = { ...findSubject('02'), lecture: 'L2' };
-        const clashes = Engine.getClashingSubjects([s1, s2], 'winter2029', 'summer2027');
+        const clashes = Engine.getClashingSubjects([s1, s2], 'winter2029', 'summer2026');
         assert.deepEqual(examWarnings(clashes, '01'), []);
     });
 
     test('BUG-001: in the current term with a published timetable, a matching exam time is a confirmed clash', () => {
         const s1 = { ...contracts(), exam: '4 Mar 2027, 9.00 am' };
         const s2 = { ...insolvency(), exam: '4 Mar 2027, 9.00 am' };
-        const clashes = Engine.getClashingSubjects([s1, s2], 'summer2027', 'summer2027');
+        const clashes = Engine.getClashingSubjects([s1, s2], 'summer2026', 'summer2026');
         assert.deepEqual(examWarnings(clashes, '04'), ['Exam clash on 4 Mar 2027, 9.00 am']);
     });
 
     test('BUG-001: in the current term with a published timetable, real data overrides the historical signal', () => {
         const s1 = { ...contracts(), exam: '4 Mar 2027, 9.00 am' };
         const s2 = { ...insolvency(), exam: '5 Mar 2027, 1.45 pm' };
-        const clashes = Engine.getClashingSubjects([s1, s2], 'summer2027', 'summer2027');
+        const clashes = Engine.getClashingSubjects([s1, s2], 'summer2026', 'summer2026');
         assert.deepEqual(examWarnings(clashes, '04'), [],
             'LPAB scheduled them apart this term, so their past clash is irrelevant');
     });
 
     test('BUG-001: in the current term before its timetable is published, a historical clash is flagged as possible', () => {
-        const clashes = Engine.getClashingSubjects([contracts(), insolvency()], 'summer2027', 'summer2027');
+        const clashes = Engine.getClashingSubjects([contracts(), insolvency()], 'summer2026', 'summer2026');
         assert.deepEqual(examWarnings(clashes, '04'), [POSSIBLE_EXAM_CLASH]);
     });
 
     test('BUG-001: current-term exam dates are never treated as a confirmed clash in a different term', () => {
         const s1 = { ...findSubject('01'), lecture: 'L1', exam: '4 Mar 2027, 9.00 am' };
         const s2 = { ...findSubject('02'), lecture: 'L2', exam: '4 Mar 2027, 9.00 am' };
-        const clashes = Engine.getClashingSubjects([s1, s2], 'winter2029', 'summer2027');
+        const clashes = Engine.getClashingSubjects([s1, s2], 'winter2029', 'summer2026');
         assert.deepEqual(examWarnings(clashes, '01'), [POSSIBLE_EXAM_CLASH],
             'the published current-term timetable is evidence of risk for other terms, not a confirmed clash in them');
     });
 });
 
 describe('Saved plans pick up current subject data on load', () => {
-    test('a subject saved with a past term\'s exam date shows the current subjects.js data after reload', async () => {
+    test('a subject saved with a past term\'s exam date shows the current subjects.js data after loadData()', async () => {
         // Simulates a plan saved before a term rollover: the stored copy of
         // Foundations of Law still carries the old September 2026 exam date.
+        // Goes through loadData(), which is how ui-main.js starts the app.
         const live = findSubject('01');
         const stale = { ...live, exam: '8 Sep 2026, 9.00 am', lecture: 'Friday' };
-        const store = { lpab_planner_data: JSON.stringify({ completed: [], summer2027: [stale] }) };
+        const store = { lpab_planner_data: JSON.stringify({ completed: [], summer2026: [stale] }) };
         globalThis.localStorage = {
             getItem: key => store[key] ?? null,
             setItem: (key, value) => { store[key] = value; },
@@ -86,7 +88,8 @@ describe('Saved plans pick up current subject data on load', () => {
         };
 
         const { PlannerState } = await import('../js/state/planner-state.js');
-        const loaded = PlannerState.getPlan().summer2027[0];
+        PlannerState.loadData();
+        const loaded = PlannerState.getPlan().summer2026[0];
 
         assert.equal(loaded.exam, live.exam, 'exam date comes from subjects.js, not the saved snapshot');
         assert.equal(loaded.lecture, live.lecture, 'lecture night comes from subjects.js, not the saved snapshot');
@@ -133,20 +136,13 @@ describe('BUG-003 (fixed): malformed exam dates no longer display as valid', () 
 });
 
 describe('BUG-004 (fixed): markdown export sorts semesters chronologically', () => {
-    test('BUG-004: export ordering now matches chronological order across year boundaries', () => {
-        // Mirrors the fixed ui-toolbar.js:compareTermsChronologically exactly.
-        function compareTermsChronologically(a, b) {
-            const yearOf = term => parseInt(term.match(/\d{4}/)[0], 10);
-            const rankOf = term => (term.startsWith('summer') ? 0 : 1);
-            return (yearOf(a) * 10 + rankOf(a)) - (yearOf(b) * 10 + rankOf(b));
-        }
-
-        const plan = { completed: [], winter2029: [], summer2030: [] };
-        const exportOrder = Object.keys(plan).filter(k => k !== 'completed').sort(compareTermsChronologically);
-        const chronologicalOrder = ['winter2029', 'summer2030']; // winter2029 precedes summer2030 in real time
-        assert.deepEqual(exportOrder, chronologicalOrder,
-            'BUG-004 [fixed]: ui-toolbar.js:handleExport now sorts semester keys chronologically ' +
-            '(via compareTermsChronologically), matching the order the board itself renders in.');
+    test('BUG-004: export ordering matches the board\'s term sequence, including within a year', () => {
+        // ui-toolbar.js:handleExport sorts with compareTerms; the board renders termSequence.
+        const plan = { completed: [], summer2030: [], winter2030: [], summer2029: [], winter2029: [] };
+        const exportOrder = Object.keys(plan).filter(isTermId).sort(compareTerms);
+        assert.deepEqual(exportOrder, termSequence('winter2029', 4),
+            'BUG-004 [fixed]: winter2029 (May–Sep 2029) precedes summer2029 (Nov 2029–Mar 2030), ' +
+            'which precedes winter2030, matching the board.');
     });
 });
 
