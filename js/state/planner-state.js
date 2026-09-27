@@ -134,7 +134,7 @@ export const PlannerState = {
     // ── Persistence ───────────────────────────────────────────────────────────
 
     loadData() {
-        _plan   = loadPlan();
+        _plan   = refreshSubjects(loadPlan());
         _hidden = loadHiddenSubjects();
     },
 
