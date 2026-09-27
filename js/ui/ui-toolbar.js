@@ -1,6 +1,7 @@
 // ui-toolbar.js — export, print, and reset buttons
 import { PlannerState } from '../../planner.js';
 import { clearAll } from '../state/storage.js';
+import { isTermId, formatTermLabel, compareTerms } from '../utils/terms.js';
 import { renderPlannerBoard } from './ui-board.js';
 import { renderSubjectPool } from './ui-pool.js';
 
@@ -23,9 +24,8 @@ function handleExport() {
         text += '\n';
     }
 
-    Object.keys(plan).filter(k => k !== 'completed').sort(compareTermsChronologically).forEach(term => {
-        const termName = term.replace('winter', 'Winter ').replace('summer', 'Summer ');
-        text += `## ${termName}\n`;
+    Object.keys(plan).filter(isTermId).sort(compareTerms).forEach(term => {
+        text += `## ${formatTermLabel(term)}\n`;
         (plan[term] || []).forEach(s => {
             text += `- ${s.id}: ${s.name} (${s.lecture}${s.exam ? ', Exam: ' + s.exam : ''})\n`;
         });
@@ -35,17 +35,6 @@ function handleExport() {
     navigator.clipboard.writeText(text)
         .then(() => showToast('Plan copied to clipboard!'))
         .catch(() => showToast('Could not copy — please try again.', true));
-}
-
-/**
- * Order term IDs (e.g. 'winter2029', 'summer2030') by real calendar time,
- * matching the sequence the board itself renders semesters in. Summer
- * (March exams) precedes Winter (Sep exams) within the same year.
- */
-function compareTermsChronologically(a, b) {
-    const yearOf = term => parseInt(term.match(/\d{4}/)[0], 10);
-    const rankOf = term => (term.startsWith('summer') ? 0 : 1);
-    return (yearOf(a) * 10 + rankOf(a)) - (yearOf(b) * 10 + rankOf(b));
 }
 
 function handleReset() {

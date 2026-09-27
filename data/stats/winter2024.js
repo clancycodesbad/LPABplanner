@@ -14,7 +14,7 @@
 
 export const winter2024Stats = {
     term:              'winter2024',
-    label:             'Winter (Term 2) 2024',
+    label:             'Winter 2024',
     gradingScheme:     'v2',
     totalEnrolled:     2004,
     totalDNS:          238,

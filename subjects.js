@@ -9,9 +9,10 @@
  * Derive the current LPAB term ID from a date, so the planner always
  * points at the right semester without a hardcoded value to update by hand.
  *
- * LPAB runs two terms a year:
- *   Summer — lectures commence November, exams held ~early March
- *   Winter — lectures commence May, exams held ~early September
+ * LPAB runs two terms a year. A term ID names the year the term starts in
+ * (see js/utils/terms.js):
+ *   winterYYYY — lectures from May YYYY, exams ~early September YYYY
+ *   summerYYYY — lectures from November YYYY, exams ~early March YYYY+1
  *
  * The term flips to the next one shortly after its exam period ends —
  * 15 March and 15 September are used as cutoffs, a few days past each
@@ -20,16 +21,16 @@
  * dates that shift year to year.
  *
  * @param {Date} [date] — defaults to now
- * @returns {string} e.g. 'winter2026', 'summer2027'
+ * @returns {string} e.g. 'winter2026', 'summer2026'
  */
 export function computeCurrentTerm(date = new Date()) {
     const year = date.getFullYear();
     const cutoffMar15 = new Date(year, 2, 15);
     const cutoffSep15 = new Date(year, 8, 15);
 
-    if (date < cutoffMar15) return `summer${year}`;
+    if (date < cutoffMar15) return `summer${year - 1}`; // Summer term that started last November
     if (date < cutoffSep15) return `winter${year}`;
-    return `summer${year + 1}`;
+    return `summer${year}`;
 }
 
 export const currentTerm = computeCurrentTerm();

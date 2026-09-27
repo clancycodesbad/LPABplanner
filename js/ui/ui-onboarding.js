@@ -24,6 +24,7 @@ import { subjects, currentTerm } from '../../subjects.js';
 import { PlannerState } from '../state/planner-state.js';
 import { markOnboardingDone } from '../state/storage.js';
 import { SUGGESTED_PATHWAY, generateTermSequence } from '../data/suggested-pathway.js';
+import { formatTermLabel } from '../utils/terms.js';
 import { showToast } from './ui-toolbar.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -114,10 +115,7 @@ function renderPathwayConfirm(overlay, onComplete) {
             </div>
             <div class="ob-pathway-preview">
                 ${SUGGESTED_PATHWAY.map((sem, i) => {
-                    const termId = terms[i];
-                    const termLabel = termId
-                        .replace('winter', 'Winter ')
-                        .replace('summer', 'Summer ');
+                    const termLabel = formatTermLabel(terms[i]);
                     const subjectChips = sem.subjects.map(id => {
                         const s = subjects.find(sub => sub.id === id);
                         return s

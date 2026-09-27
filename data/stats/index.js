@@ -5,9 +5,14 @@
 //   2. Uncomment or add one export line below.
 //   3. That's it — the UI picks it up automatically.
 //
-// Term key convention (must match subjects.js and archive.js):
+// Term key convention:
 //   summer = March examination sitting
 //   winter = July/August examination sitting
+// Note this differs from plan term IDs (js/utils/terms.js), where summerYYYY
+// is the term starting in November YYYY: stats summer2026 is plan summer2025.
+//
+// Labels use the site-wide style: 'Winter 2025', and 'Summer 2025/26' for the
+// March 2026 sitting.
 //
 // Grading schemes:
 //   v1 — prior to Term 2, 2024:  Fail / Pass / Pass with Merit / Pass with Distinction

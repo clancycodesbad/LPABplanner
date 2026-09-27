@@ -2,6 +2,7 @@
 import { subjects, currentTerm } from '../../subjects.js';
 import { historicalExams } from '../../archive.js';
 import { parseExamDate } from '../utils/datetime.js';
+import { isTermId, formatTermLabel, compareTerms, termSequence } from '../utils/terms.js';
 import { PlannerState } from '../../planner.js';
 import { Engine, POSSIBLE_EXAM_CLASH } from '../../engine.js';
 import { renderSubjectPool } from './ui-pool.js';
@@ -28,15 +29,13 @@ export function getExamText(subject, semesterId) {
 
     let lastKnown = null;
     if (subject.exam && parseExamDate(subject.exam)) {
-        const termName = currentTerm.replace('winter','Winter ').replace('summer','Summer ');
-        lastKnown = `${subject.exam} (${termName})`;
+        lastKnown = `${subject.exam} (${formatTermLabel(currentTerm)})`;
     } else if (typeof historicalExams !== 'undefined') {
         const pastTerms = Object.keys(historicalExams).reverse();
         for (const term of pastTerms) {
             const pastSub = historicalExams[term].find(s => s.id === subject.id);
             if (pastSub && pastSub.exam && parseExamDate(pastSub.exam)) {
-                const termName = term.replace('winter','Winter ').replace('summer','Summer ');
-                lastKnown = `${pastSub.exam} (${termName})`;
+                lastKnown = `${pastSub.exam} (${formatTermLabel(term)})`;
                 break;
             }
         }
@@ -104,15 +103,13 @@ export function renderPlannerBoard() {
     const unassignedSubjects = Math.max(20 - progress.totalSubjects, 0);
     const extraSemestersNeeded = Math.ceil(unassignedSubjects / 3);
 
-    const allTerms = [];
-    let year = 2026;
-    for (let i = 0; i < 15; i++) {
-        allTerms.push(`winter${year}`);
-        allTerms.push(`summer${year}`);
-        year++;
-    }
-
+    // Start at the current term, or earlier if a past term still holds subjects,
+    // so placements in terms that have since ended stay visible.
     const plan = PlannerState.getPlan();
+    const plannedTerms = Object.keys(plan).filter(t => isTermId(t) && plan[t].length > 0);
+    const firstTerm = [currentTerm, ...plannedTerms].sort(compareTerms)[0];
+    const allTerms = termSequence(firstTerm, 30);
+
     let lastPopulatedIndex = -1;
     allTerms.forEach((term, index) => {
         if (plan[term] && plan[term].length > 0) lastPopulatedIndex = index;
@@ -126,7 +123,7 @@ export function renderPlannerBoard() {
 
         const card = document.createElement('section');
         card.className = 'semester-card';
-        const titleName = semesterId.replace('winter','Winter ').replace('summer','Summer ');
+        const titleName = formatTermLabel(semesterId);
 
         card.innerHTML = `<h2>${titleName}</h2><div class="semester-slots"></div>`;
         const slotsContainer = card.querySelector('.semester-slots');

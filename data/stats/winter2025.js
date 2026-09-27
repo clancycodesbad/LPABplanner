@@ -16,7 +16,7 @@
 
 export const winter2025Stats = {
     term:              'winter2025',
-    label:             'September (Winter) 2025',
+    label:             'Winter 2025',
     gradingScheme:     'v2',
     totalEnrolled:     0,
     totalSat:          1883,

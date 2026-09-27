@@ -15,7 +15,7 @@
 
 export const summer2026Stats = {
     term:              'summer2026',
-    label:             'March (Summer) 2026',
+    label:             'Summer 2025/26',
     totalCandidates:   1960,
     // Cohort-level totals (bottom row of the published table)
     cohortFail:        18.1,
