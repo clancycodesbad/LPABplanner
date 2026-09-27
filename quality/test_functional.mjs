@@ -461,10 +461,11 @@ describe('Boundary: checkCoreOrder with out-of-range subjectId', () => {
 });
 
 describe('Markdown export (REQ-021)', () => {
+    const s = findSubject;
     const headings = text => text.split('\n').filter(l => l.startsWith('## ')).map(l => l.slice(3));
 
     test('export ordering — semesters are listed chronologically, matching the board (condition c)', () => {
-        const plan = { completed: [], summer2029: [], winter2030: [], winter2029: [] };
+        const plan = { completed: [], summer2029: [s('05')], winter2030: [s('06')], winter2029: [s('07')] };
         assert.deepEqual(headings(formatPlanMarkdown(plan, 'summer2026')),
             ['Winter 2029', 'Summer 2029/30', 'Winter 2030'],
             'REQ-021(c): export order must match chronological order (see BUGS.md BUG-004, fixed)');
@@ -477,6 +478,11 @@ describe('Markdown export (REQ-021)', () => {
         const line = id => lines.find(l => l.startsWith(`- ${id}:`));
         assert.ok(line('01').includes('Exam: 4 Mar 2027, 9.00 am'), 'current term shows its exam date');
         assert.ok(!line('02').includes('Exam:'), 'a future term does not show the current term\'s date');
+    });
+
+    test('export — semesters with no subjects are left out', () => {
+        const plan = { completed: [], summer2026: [s('01')], winter2027: [], summer2027: [] };
+        assert.deepEqual(headings(formatPlanMarkdown(plan, 'summer2026')), ['Summer 2026/27']);
     });
 
     test('export — an unparseable exam date is left out rather than shown as valid', () => {
