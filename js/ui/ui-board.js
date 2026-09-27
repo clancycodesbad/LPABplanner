@@ -125,7 +125,7 @@ export function renderPlannerBoard() {
         card.className = 'semester-card';
         const titleName = formatTermLabel(semesterId);
 
-        card.innerHTML = `<h2>${titleName}</h2><div class="semester-slots"></div>`;
+        card.innerHTML = `<h2>${titleName}</h2><div class="semester-slots" data-semester-id="${semesterId}"></div>`;
         const slotsContainer = card.querySelector('.semester-slots');
 
         slotsContainer.ondragover  = (e) => { e.preventDefault(); e.currentTarget.classList.add('drag-over'); };

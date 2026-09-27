@@ -56,14 +56,8 @@ function getDropTarget(x, y) {
 }
 
 function semesterIdFromContainer(container) {
-    if (container.id === 'completed-slots') return 'completed';
-    // semester-slots lives inside .semester-card whose <h2> holds the term name
-    const card = container.closest('.semester-card');
-    if (!card) return null;
-    const heading = card.querySelector('h2');
-    if (!heading) return null;
-    // e.g. "Winter 2026" → "winter2026"
-    return heading.textContent.trim().replace(' ', '').toLowerCase();
+    // Drop areas carry their semester ID; the heading is display text only.
+    return container.dataset.semesterId || null;
 }
 
 // ─── Highlight helpers ─────────────────────────────────────────
