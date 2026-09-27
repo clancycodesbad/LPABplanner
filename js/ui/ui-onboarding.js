@@ -394,16 +394,16 @@ const STEPS = [
         title: 'How to build your plan',
         tiles: [
             { heading: 'Browse the subject pool', body: 'All available subjects are listed in the left-hand panel. Use the filter to narrow by semester, type, or lecture night.' },
-            { heading: 'Drag into a semester',    body: 'Drag any subject from the pool into the semester card where you intend to take it. Each semester holds a maximum of four subjects.' },
+            { heading: 'Drag into a semester',    body: 'Drag any subject from the pool into the semester card where you intend to take it. Each semester holds a maximum of four subjects, and some subjects run in winter or summer only.' },
             { heading: 'Mark subjects complete',  body: 'Once you have finished a subject, double-click its tile or press the Done button to move it to the Completed section.' },
         ]
     },
     {
         title: 'Clashes and warnings',
         tiles: [
-            { heading: 'Lecture clash',        body: 'Two subjects in the same semester sharing the same lecture night are highlighted with a red border. Move one to a different semester to resolve it.' },
-            { heading: 'Exam clash',           body: 'Subjects whose final exams overlap in time are also flagged. Check the exam date on each tile before confirming your choices.' },
-            { heading: 'Semester availability', body: 'Some subjects run in winter only, others in summer only. Subjects greyed out in the pool cannot be taken in the currently selected semester.' },
+            { heading: 'Clashes',              body: 'Two subjects in the same semester that share a lecture night, or an exam time in the published timetable, are highlighted with a red border. Move one to a different semester to resolve it.' },
+            { heading: 'Possible exam clash',  body: 'Before a semester\'s exam timetable is published, subjects that have been examined at the same time in the past are marked in amber with an hourglass. Check the timetable once it\'s out.' },
+            { heading: 'Out of sequence',      body: 'The first 11 core subjects are taken in order. A core subject placed before an earlier one is marked in amber until the earlier subject is placed in the same or an earlier semester. Studying out of order needs LPAB approval.' },
         ]
     }
 ];

@@ -96,7 +96,7 @@ export const PlannerState = {
         savePlan(_plan);
 
         // Core sequence warning — does not block, returned alongside success
-        const coreWarning = Engine.checkCoreOrder(subject.id, _plan);
+        const coreWarning = Engine.checkCoreOrder(subject.id, semesterId, _plan);
         if (coreWarning) {
             return { success: true, warnings: [coreWarning] };
         }
