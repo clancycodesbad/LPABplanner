@@ -16,7 +16,7 @@
 
 export const summer2023Stats = {
     term:              'summer2023',
-    label:             'Summer (Term 1) 2023',
+    label:             'Summer 2022/23',
     gradingScheme:     'v1',
     totalEnrolled:     1881,
     totalDNS:          227,

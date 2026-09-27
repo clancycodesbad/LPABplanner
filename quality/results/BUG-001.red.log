@@ -1,0 +1,26 @@
+RED
+--- Test output for BUG-001 red phase ---
+Command: node --test --test-name-pattern="BUG-001" quality/test_regression.mjs
+Exit code: 0
+TAP version 13
+# Subtest: BUG-001: exam-clash detection scoped to currentTerm only
+    # Subtest: BUG-001: two subjects with identical exam times in a FUTURE term are not flagged (documents open bug)
+    ok 1 - BUG-001: two subjects with identical exam times in a FUTURE term are not flagged (documents open bug)
+      ---
+      duration_ms: 0.6529
+      ...
+    1..1
+ok 1 - BUG-001: exam-clash detection scoped to currentTerm only
+  ---
+  duration_ms: 1.4199
+  type: 'suite'
+  ...
+1..1
+# tests 1
+# suites 1
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 90.7641

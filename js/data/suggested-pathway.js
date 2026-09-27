@@ -8,6 +8,8 @@
  * Source: LPAB Diploma in Law — Suggested Study Sequence
  */
 
+import { termSequence } from '../utils/terms.js';
+
 export const SUGGESTED_PATHWAY = [
     { label: '1st Semester', subjects: ['01', '02'] },
     { label: '2nd Semester', subjects: ['03', '04'] },
@@ -27,16 +29,5 @@ export const SUGGESTED_PATHWAY = [
  * @returns {string[]}          e.g. ['winter2026', 'summer2026', 'winter2027', ...]
  */
 export function generateTermSequence(currentTerm) {
-    const isWinter = currentTerm.toLowerCase().includes('winter');
-    const yearMatch = currentTerm.match(/(\d{4})/);
-    let year = yearMatch ? parseInt(yearMatch[1], 10) : new Date().getFullYear();
-    let nextIsWinter = isWinter;
-
-    const terms = [];
-    for (let i = 0; i < 8; i++) {
-        terms.push(`${nextIsWinter ? 'winter' : 'summer'}${year}`);
-        if (!nextIsWinter) year++; // summer → winter bumps year
-        nextIsWinter = !nextIsWinter;
-    }
-    return terms;
+    return termSequence(currentTerm, SUGGESTED_PATHWAY.length);
 }

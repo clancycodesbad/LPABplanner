@@ -1,0 +1,27 @@
+RED
+--- Test output for BUG-003 red phase ---
+Command: node --test --test-name-pattern="BUG-003" quality/test_regression.mjs
+Exit code: 0
+TAP version 13
+# [datetime] Could not parse exam string: "8 Sept 2026, 9.00 am"
+# Subtest: BUG-003: malformed exam date displayed as valid but excluded from clash detection
+    # Subtest: BUG-003: a malformed (non-null) exam string parses to null but is truthy for display purposes (documents open bug)
+    ok 1 - BUG-003: a malformed (non-null) exam string parses to null but is truthy for display purposes (documents open bug)
+      ---
+      duration_ms: 0.8503
+      ...
+    1..1
+ok 1 - BUG-003: malformed exam date displayed as valid but excluded from clash detection
+  ---
+  duration_ms: 1.5323
+  type: 'suite'
+  ...
+1..1
+# tests 1
+# suites 1
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 91.3534

@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.5.6",
+  "generated_at": "2026-09-26T16:45:00Z",
+  "records": [
+    { "id": "REQ-001", "title": "Term availability enforcement", "tier": 3, "functional_section": "Semester Validation and Enrollment Rules", "specificity": "specific", "use_cases": ["UC-01","UC-02","UC-08"] },
+    { "id": "REQ-002", "title": "Semester capacity limit", "tier": 3, "functional_section": "Semester Validation and Enrollment Rules", "specificity": "specific", "use_cases": ["UC-01","UC-02"] },
+    { "id": "REQ-003", "title": "Duplicate-subject prevention", "tier": 3, "functional_section": "Semester Validation and Enrollment Rules", "specificity": "specific", "use_cases": ["UC-02"] },
+    { "id": "REQ-004", "title": "Core-order advisory warning", "tier": 3, "functional_section": "Core Subject Sequencing", "specificity": "specific", "use_cases": ["UC-01"] },
+    { "id": "REQ-005", "title": "Lecture-night clash detection (all semesters)", "tier": 3, "functional_section": "Clash Detection", "specificity": "specific", "use_cases": ["UC-04"] },
+    { "id": "REQ-006", "title": "Exam-time clash detection (current term only)", "tier": 3, "functional_section": "Clash Detection", "specificity": "specific", "use_cases": ["UC-04"] },
+    { "id": "REQ-007", "title": "Exam date parsing strictness", "tier": 4, "functional_section": "Clash Detection", "specificity": "specific", "use_cases": ["UC-05","UC-08"] },
+    { "id": "REQ-008", "title": "Exam-time equality is exact", "tier": 3, "functional_section": "Clash Detection", "specificity": "specific", "use_cases": ["UC-04"] },
+    { "id": "REQ-009", "title": "Null-safe clash inputs", "tier": 3, "functional_section": "Clash Detection", "specificity": "specific", "use_cases": ["UC-04","UC-05"] },
+    { "id": "REQ-010", "title": "Compulsory/elective progress counts", "tier": 3, "functional_section": "Progress Tracking and Graduation Status", "specificity": "specific", "use_cases": ["UC-03"] },
+    { "id": "REQ-011", "title": "Graduation-ready determination", "tier": 3, "functional_section": "Progress Tracking and Graduation Status", "specificity": "specific", "use_cases": ["UC-01","UC-03"] },
+    { "id": "REQ-012", "title": "group/type field consistency", "tier": 5, "functional_section": "Progress Tracking and Graduation Status", "specificity": "architectural-guidance", "use_cases": ["UC-03","UC-08"] },
+    { "id": "REQ-013", "title": "Autosave on every mutation", "tier": 4, "functional_section": "Persistence and State Management", "specificity": "specific", "use_cases": ["UC-01","UC-02","UC-03","UC-07"] },
+    { "id": "REQ-014", "title": "Storage failure resilience", "tier": 3, "functional_section": "Persistence and State Management", "specificity": "specific", "use_cases": ["UC-01","UC-02","UC-03","UC-04","UC-05","UC-06","UC-07","UC-08"] },
+    { "id": "REQ-015", "title": "Two-step destructive reset confirmation", "tier": 4, "functional_section": "Persistence and State Management", "specificity": "specific", "use_cases": ["UC-07"] },
+    { "id": "REQ-016", "title": "First-run wizard gating", "tier": 3, "functional_section": "Onboarding", "specificity": "specific", "use_cases": ["UC-01"] },
+    { "id": "REQ-017", "title": "Onboarding placement failures must surface", "tier": 5, "functional_section": "Onboarding", "specificity": "specific", "use_cases": ["UC-01"] },
+    { "id": "REQ-018", "title": "Pool excludes placed and hidden subjects", "tier": 3, "functional_section": "Subject Pool Display", "specificity": "specific", "use_cases": ["UC-01","UC-02"] },
+    { "id": "REQ-019", "title": "Exam-clash warning display", "tier": 3, "functional_section": "Exam Date Display", "specificity": "specific", "use_cases": ["UC-04"] },
+    { "id": "REQ-020", "title": "Exam text fallback chain", "tier": 3, "functional_section": "Exam Date Display", "specificity": "specific", "use_cases": ["UC-05"] },
+    { "id": "REQ-021", "title": "Markdown export completeness and ordering", "tier": 4, "functional_section": "Export", "specificity": "specific", "use_cases": ["UC-06"] }
+  ]
+}

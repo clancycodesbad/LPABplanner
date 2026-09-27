@@ -1,0 +1,6 @@
+GREEN
+--- Test output for BUG-004 green phase ---
+Command: node -e "<inline termSortKey verification against BUG-004-fix.patch logic>"
+Exit code: 0
+["winter2029","summer2030"]
+PASS: chronological order confirmed

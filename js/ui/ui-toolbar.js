@@ -1,6 +1,8 @@
 // ui-toolbar.js — export, print, and reset buttons
 import { PlannerState } from '../../planner.js';
 import { clearAll } from '../state/storage.js';
+import { currentTerm } from '../../subjects.js';
+import { formatPlanMarkdown } from '../services/plan-export.js';
 import { renderPlannerBoard } from './ui-board.js';
 import { renderSubjectPool } from './ui-pool.js';
 
@@ -13,24 +15,7 @@ export function setupExportButton() {
 }
 
 function handleExport() {
-    const plan = PlannerState.getPlan();
-    let text = '# LPAB Course Plan\n\n';
-
-    const completed = plan['completed'] || [];
-    if (completed.length) {
-        text += '## Completed\n';
-        completed.forEach(s => { text += `- ${s.id}: ${s.name}\n`; });
-        text += '\n';
-    }
-
-    Object.keys(plan).filter(k => k !== 'completed').sort().forEach(term => {
-        const termName = term.replace('winter', 'Winter ').replace('summer', 'Summer ');
-        text += `## ${termName}\n`;
-        (plan[term] || []).forEach(s => {
-            text += `- ${s.id}: ${s.name} (${s.lecture}${s.exam ? ', Exam: ' + s.exam : ''})\n`;
-        });
-        text += '\n';
-    });
+    const text = formatPlanMarkdown(PlannerState.getPlan(), currentTerm);
 
     navigator.clipboard.writeText(text)
         .then(() => showToast('Plan copied to clipboard!'))
@@ -140,7 +125,15 @@ function showResetModal() {
     });
 }
 
-function showToast(message, isError = false) {
+/**
+ * Show a brief fixed-position toast message.
+ * Stage 3: exported so ui-board.js can fire toasts for touch drop errors,
+ * keeping feedback visible regardless of scroll position.
+ *
+ * @param {string}  message  Text to display.
+ * @param {boolean} isError  When true, renders with error styling.
+ */
+export function showToast(message, isError = false) {
     const existing = document.getElementById('ob-toast');
     if (existing) existing.remove();
     const toast = document.createElement('div');

@@ -1,0 +1,18 @@
+--- a/js/ui/ui-toolbar.js	2026-09-27 02:18:47.263276200 +1000
++++ b/js/ui/ui-toolbar.js	2026-09-27 02:19:50.394888100 +1000
+@@ -23,7 +23,14 @@
+         text += '\n';
+     }
+ 
+-    Object.keys(plan).filter(k => k !== 'completed').sort().forEach(term => {
++    function termSortKey(term) {
++        const match = term.match(/\d{4}/);
++        const year = match ? parseInt(match[0], 10) : 0;
++        const seasonRank = term.startsWith('summer') ? 0 : 1; // summer (March) precedes winter (Jul/Aug) within a year
++        return year * 10 + seasonRank;
++    }
++
++    Object.keys(plan).filter(k => k !== 'completed').sort((a, b) => termSortKey(a) - termSortKey(b)).forEach(term => {
+         const termName = term.replace('winter', 'Winter ').replace('summer', 'Summer ');
+         text += `## ${termName}\n`;
+         (plan[term] || []).forEach(s => {

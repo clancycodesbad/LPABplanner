@@ -1,0 +1,26 @@
+RED
+--- Test output for BUG-002 red phase ---
+Command: node --test --test-name-pattern="BUG-002" quality/test_regression.mjs
+Exit code: 0
+TAP version 13
+# Subtest: BUG-002: onboarding placement failures are silently discarded
+    # Subtest: BUG-002: PlannerState.addSubject failures in a batch-add loop produce no error signal (documents open bug)
+    ok 1 - BUG-002: PlannerState.addSubject failures in a batch-add loop produce no error signal (documents open bug)
+      ---
+      duration_ms: 0.5042
+      ...
+    1..1
+ok 1 - BUG-002: onboarding placement failures are silently discarded
+  ---
+  duration_ms: 1.1914
+  type: 'suite'
+  ...
+1..1
+# tests 1
+# suites 1
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 89.5707

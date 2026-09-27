@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.5.6",
+  "generated_at": "2026-09-26T16:45:00Z",
+  "records": [
+    { "id": "UC-01", "title": "New student sets up their plan via the suggested pathway", "actor": "student" },
+    { "id": "UC-02", "title": "Student rebalances their plan by dragging a subject to a different semester", "actor": "student" },
+    { "id": "UC-03", "title": "Student tracks graduation progress", "actor": "student" },
+    { "id": "UC-04", "title": "Student resolves a lecture-night or exam-time clash", "actor": "student" },
+    { "id": "UC-05", "title": "Student checks a subject's exam date before committing", "actor": "student" },
+    { "id": "UC-06", "title": "Student exports their plan for use outside the app", "actor": "student" },
+    { "id": "UC-07", "title": "Student resets their plan without losing preferences", "actor": "student" },
+    { "id": "UC-08", "title": "Maintainer updates the app for a new LPAB semester", "actor": "volunteer maintainer" }
+  ]
+}
