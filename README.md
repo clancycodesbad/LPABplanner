@@ -43,8 +43,6 @@ npx serve .
 
 Then open `http://localhost:8080` in your browser.
 
-> **Single-file version:** A self-contained `LPABPlannerApp.html` exists in the [`html file version`](./html%20file%20version/) folder for offline sharing or demos. It is a snapshot and is **not** kept in sync with the main codebase. See the README in that folder for details.
-
 ---
 
 ## Project Structure
@@ -163,7 +161,6 @@ The project uses [Semantic Versioning](https://semver.org): bump **MAJOR** for c
 If you are an LLM or agent working on this repository:
 
 - **Always work from the modular source files** listed in the Project Structure above
-- **Do not read or modify** `html file version/LPABPlannerApp.html` unless explicitly instructed — it is a stale snapshot
 - **`planner.js` is a shim** — it only re-exports from `js/state/planner-state.js`. Do not add logic to it
 - **One module, one concern** — if a change touches more than one module's responsibility, question whether the separation is still clean
 - **Exam date format is strict** — `datetime.js` expects `'D Mon YYYY, H.MM am/pm'`. Do not change this format in `subjects.js` without updating the parser
