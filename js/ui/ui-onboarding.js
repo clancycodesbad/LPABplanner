@@ -383,7 +383,7 @@ function finishWizard(overlay, onComplete) {
 
 const STEPS = [
     {
-        title: 'Welcome to the LPAB Elective Planner',
+        title: 'Welcome to the LPAB Course Planner',
         tiles: [
             { heading: 'Plan your diploma',     body: 'Map out every subject across your winter and summer semesters, from now until graduation.' },
             { heading: 'Spot clashes instantly', body: 'The planner highlights lecture-night and exam conflicts the moment they occur, so you can adjust before it matters.' },
