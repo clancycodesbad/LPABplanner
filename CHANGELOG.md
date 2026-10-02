@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html): MAJOR for changes that break saved plans or existing behaviour, MINOR for new features, PATCH for fixes and semester data updates.
 
+## [1.5.1] - 2026-10-02
+
+### Changed
+
+- The app is called "LPAB Course Planner" everywhere. The page title, header and help tour said "LPAB Elective Planner", while the README and first-run setup said "LPAB Course Planner".
+- The licence names the current GitHub account, clancycodesbad (formerly Mercsal).
+
 ## [1.5.0] - 2026-09-27
 
 ### Added
@@ -135,6 +142,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - **Subject pool disappearing after state refactor** — `ui-board.js` was accessing `PlannerState.plan` directly. After `_plan` became a private variable this returned `undefined`, causing the semester render loop to produce zero terms and the subject pool to never draw. Fixed by adding a `getPlan()` accessor to `PlannerState` and updating the one reference in `ui-board.js`. ([`d229d6f`](https://github.com/clancycodesbad/LPABplanner/commit/d229d6f1d30bb5eb6c2b91d74cae950076b86fca))
 
+[1.5.1]: https://github.com/clancycodesbad/LPABplanner/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/clancycodesbad/LPABplanner/compare/v1.4.2...v1.5.0
 [1.4.2]: https://github.com/clancycodesbad/LPABplanner/compare/v1.4.1...v1.4.2
 [1.4.1]: https://github.com/clancycodesbad/LPABplanner/compare/v1.4.0...v1.4.1
