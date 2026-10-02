@@ -50,5 +50,5 @@ A Quality Playbook run (v1.5.6) was completed on 2026-09-26, with a full three-r
 - `quality/BUGS.md` — 5 confirmed bugs (4 HIGH, 1 MEDIUM), all fixed on 2026-09-27, each with a regression test.
 - `quality/REQUIREMENTS.md` — 21 derived requirements across 8 use cases.
 - `quality/QUALITY.md` — quality constitution with 4 fitness-to-purpose scenarios grounded in this codebase.
-- `quality/spec_audits/2026-09-27-triage.md` — the three-reviewer reconciliation, including two open specification questions for the maintainer (core-order temporal checks, semester-ID validation).
+- `quality/spec_audits/2026-09-27-triage.md` — the three-reviewer reconciliation. Its two open specification questions (core-order temporal checks, semester-ID validation) were settled in 1.4.0; see `quality/BUGS.md`.
 - Run the functional/regression test suites: `node --test quality/test_functional.mjs quality/test_regression.mjs` (Node's built-in test runner — no install needed).

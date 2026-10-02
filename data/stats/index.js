@@ -7,7 +7,7 @@
 //
 // Term key convention:
 //   summer = March examination sitting
-//   winter = July/August examination sitting
+//   winter = the second sitting of the year (September in 2025 and 2026)
 // Note this differs from plan term IDs (js/utils/terms.js), where summerYYYY
 // is the term starting in November YYYY: stats summer2026 is plan summer2025.
 //
@@ -19,7 +19,7 @@
 //   v2 — Term 2, 2024 onward:    Fail / Pass / Credit / Distinction / High Distinction
 //
 // DNS (Did Not Sit) is stored per-subject as a raw count.
-// The engine treats DNS as part of the effective fail rate for analysis and display.
+// stats-service.js counts DNS as part of the effective fail rate for display.
 // ─────────────────────────────────────────────────────────────────
 
 export { summer2026Stats as summer2026 } from './summer2026.js';
