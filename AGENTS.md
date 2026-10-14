@@ -4,14 +4,11 @@ A client-only static web app (plain HTML/CSS/ES6 modules, no backend, no build s
 
 Because the app uses native ES6 `import`/`export`, it must be served over HTTP — it will not work opened directly as a `file://` URL. Serve it with `python3 -m http.server 8080` or `npx serve .`, then open `http://localhost:8080`.
 
-## Deployment
+## Releases and deployment
 
-- Live at `https://lpabplanner.301285.xyz`, served from plex2 (Saltbox) by an `nginx:alpine` container named `lpabplanner` on the `saltbox` Docker network, with Traefik labels in `/opt/lpabplanner/docker-compose.yml`. Public, no Authelia.
-- `/opt/lpabplanner` is a git clone of this repo on the `testing` branch, bind-mounted read-only as the web root.
-- Because the whole clone is the web root, `/opt/lpabplanner/.nginx.conf` (mounted as the container's `default.conf`) returns 404 for dot-files (including `.git/`), `docker-compose.yml`, `quality/` and all `.md` files. Keep this in place, and add any new internal folder to it.
-- To deploy: push to `testing`, then on plex2 run `cd /opt/lpabplanner && sudo git pull && sudo docker restart lpabplanner`.
-- Every deploy is a Semantic Versioning release: bump the version and date in `index.html`'s footer, add a `CHANGELOG.md` entry and tag the commit `vX.Y.Z` (see README "Releasing a New Version").
-- The GitHub repo (`clancycodesbad/LPABplanner`) is public on purpose — an exception to the private-by-default rule.
+- Every release follows Semantic Versioning: bump the version and date in `index.html`'s footer, add a `CHANGELOG.md` entry and tag the commit `vX.Y.Z` (see README "Releasing a New Version").
+- The maintainer's deployment details live in `.local/DEPLOYMENT.md`, which is gitignored. Read it before deploying. Keep server names, domains and paths out of committed files.
+- If the repo is served directly as a web root, block dot-files, `quality/` and `.md` files from being served.
 
 ## Structure
 

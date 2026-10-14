@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html): MAJOR for changes that break saved plans or existing behaviour, MINOR for new features, PATCH for fixes and semester data updates.
 
+## [1.5.2] - 2026-10-14
+
+### Changed
+
+- Summer 2026/27 exam dates from LPAB's March 2027 exam timetable (4–11 March 2027). Exam clashes in the current term are now confirmed instead of possible.
+
 ## [1.5.1] - 2026-10-02
 
 ### Changed
@@ -142,6 +148,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - **Subject pool disappearing after state refactor** — `ui-board.js` was accessing `PlannerState.plan` directly. After `_plan` became a private variable this returned `undefined`, causing the semester render loop to produce zero terms and the subject pool to never draw. Fixed by adding a `getPlan()` accessor to `PlannerState` and updating the one reference in `ui-board.js`. ([`d229d6f`](https://github.com/clancycodesbad/LPABplanner/commit/d229d6f1d30bb5eb6c2b91d74cae950076b86fca))
 
+[1.5.2]: https://github.com/clancycodesbad/LPABplanner/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/clancycodesbad/LPABplanner/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/clancycodesbad/LPABplanner/compare/v1.4.2...v1.5.0
 [1.4.2]: https://github.com/clancycodesbad/LPABplanner/compare/v1.4.1...v1.4.2

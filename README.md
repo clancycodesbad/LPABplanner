@@ -4,8 +4,6 @@ A lightweight, interactive drag-and-drop progression planner built specifically 
 
 This tool helps students map out their 20-subject progression (17 compulsory, 3 electives), tracks progress toward graduation, and automatically detects lecture and exam timetabling clashes.
 
-**Use it online:** <https://lpabplanner.301285.xyz>. Your plan is saved in your own browser; nothing is sent to a server.
-
 unashamedly vibe coded, because i sure as hell couldnt do it otherwise.
 
 ---
@@ -172,7 +170,7 @@ Then release it as a patch version (see below).
 
 ## Releasing a New Version
 
-The project uses [Semantic Versioning](https://semver.org): bump **MAJOR** for changes that break saved plans or existing behaviour, **MINOR** for new features, and **PATCH** for fixes and semester data updates. Every deploy is a release:
+The project uses [Semantic Versioning](https://semver.org): bump **MAJOR** for changes that break saved plans or existing behaviour, **MINOR** for new features, and **PATCH** for fixes and semester data updates. To make a release:
 
 1. Run the tests (see above).
 2. Add a section to `CHANGELOG.md` for the new version, following [Keep a Changelog](https://keepachangelog.com), and a compare link at the bottom.
@@ -184,13 +182,13 @@ The project uses [Semantic Versioning](https://semver.org): bump **MAJOR** for c
    git push origin testing --follow-tags
    ```
 
-5. Deploy (see `AGENTS.md`), then merge `testing` into `main` with a pull request.
+5. Merge `testing` into `main` with a pull request.
 
 ---
 
 ## For LLMs and Agents
 
-Read [`AGENTS.md`](AGENTS.md) first. It covers deployment, how term IDs work, and the rules that are easy to get wrong.
+Read [`AGENTS.md`](AGENTS.md) first. It covers how term IDs work, releases, and the rules that are easy to get wrong.
 
 ---
 
