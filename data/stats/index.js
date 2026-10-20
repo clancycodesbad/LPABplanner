@@ -22,10 +22,10 @@
 // stats-service.js counts DNS as part of the effective fail rate for display.
 // ─────────────────────────────────────────────────────────────────
 
+export { winter2026Stats as winter2026 } from './winter2026.js';
 export { summer2026Stats as summer2026 } from './summer2026.js';
 
 // Uncomment as new semesters are added:
-// export { winter2026Stats as winter2026 } from './winter2026.js';
 // export { summer2025Stats as summer2025 } from './summer2025.js';
 
 export { winter2025Stats as winter2025 } from './winter2025.js';
