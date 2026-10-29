@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html): MAJOR for changes that break saved plans or existing behaviour, MINOR for new features, PATCH for fixes and semester data updates.
 
+## [1.5.4] - 2026-10-29
+
+### Fixed
+
+- Lecture nights for Summer 2026/27, from the LEC evening lecture schedule: Competition & Consumer Law is on Monday (was Tuesday) and Health Law on Tuesday (was Monday).
+
 ## [1.5.3] - 2026-10-20
 
 ### Added
@@ -154,6 +160,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - **Subject pool disappearing after state refactor** — `ui-board.js` was accessing `PlannerState.plan` directly. After `_plan` became a private variable this returned `undefined`, causing the semester render loop to produce zero terms and the subject pool to never draw. Fixed by adding a `getPlan()` accessor to `PlannerState` and updating the one reference in `ui-board.js`. ([`d229d6f`](https://github.com/clancycodesbad/LPABplanner/commit/d229d6f1d30bb5eb6c2b91d74cae950076b86fca))
 
+[1.5.4]: https://github.com/clancycodesbad/LPABplanner/compare/v1.5.3...v1.5.4
 [1.5.3]: https://github.com/clancycodesbad/LPABplanner/compare/v1.5.2...v1.5.3
 [1.5.2]: https://github.com/clancycodesbad/LPABplanner/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/clancycodesbad/LPABplanner/compare/v1.5.0...v1.5.1
